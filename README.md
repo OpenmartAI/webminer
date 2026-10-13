@@ -1,6 +1,6 @@
 # WebMiner
 
-The [WebMiner technical report](index.html) presents our approach to extracting structured business data from HTML and Markdown, covering the progression from direct SFT to stepwise supervision and five-task mixed training, along with model evaluation results.
+The [WebMiner technical report](https://openmartai.github.io/webminer/) presents our approach to extracting structured business data from HTML and Markdown, covering the progression from direct SFT to stepwise supervision and five-task mixed training, along with model evaluation results.
 
 ## Score and generation cost
 
