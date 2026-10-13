@@ -112,61 +112,73 @@
 
   <path
     class="s2"
-    d="M 65.923453 348.177352 L 65.923453 52.689352"
+    d="M 51.043125 348.177352 L 51.043125 52.689352"
     clip-path="url(#cost-chart-p805e0188ab)"
   />
 
-  <text class="s3" x="65.923453" y="363.77579" transform="rotate(-0 65.923453 363.77579)">
+  <text class="s3" x="51.043125" y="363.77579" transform="rotate(-0 51.043125 363.77579)">
+    $0.02
+  </text>
+
+  <path
+    class="s2"
+    d="M 161.446858 348.177352 L 161.446858 52.689352"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s3" x="161.446858" y="363.77579" transform="rotate(-0 161.446858 363.77579)">
     $0.05
   </text>
 
   <path
     class="s2"
-    d="M 163.818359 348.177352 L 163.818359 52.689352"
+    d="M 244.964058 348.177352 L 244.964058 52.689352"
     clip-path="url(#cost-chart-p805e0188ab)"
   />
 
-  <text class="s3" x="163.818359" y="363.77579" transform="rotate(-0 163.818359 363.77579)">
+  <text class="s3" x="244.964058" y="363.77579" transform="rotate(-0 244.964058 363.77579)">
     $0.10
   </text>
 
   <path
     class="s2"
-    d="M 261.713264 348.177352 L 261.713264 52.689352"
+    d="M 328.481258 348.177352 L 328.481258 52.689352"
     clip-path="url(#cost-chart-p805e0188ab)"
   />
 
-  <text class="s3" x="261.713264" y="363.77579" transform="rotate(-0 261.713264 363.77579)">
+  <text class="s3" x="328.481258" y="363.77579" transform="rotate(-0 328.481258 363.77579)">
     $0.20
   </text>
 
   <path
     class="s2"
-    d="M 391.123289 348.177352 L 391.123289 52.689352"
+    d="M 438.884992 348.177352 L 438.884992 52.689352"
     clip-path="url(#cost-chart-p805e0188ab)"
   />
 
-  <text class="s3" x="391.123289" y="363.77579" transform="rotate(-0 391.123289 363.77579)">
+  <text class="s3" x="438.884992" y="363.77579" transform="rotate(-0 438.884992 363.77579)">
     $0.50
   </text>
 
   <path
     class="s2"
-    d="M 489.018194 348.177352 L 489.018194 52.689352"
+    d="M 522.402192 348.177352 L 522.402192 52.689352"
     clip-path="url(#cost-chart-p805e0188ab)"
   />
 
-  <text class="s3" x="489.018194" y="363.77579" transform="rotate(-0 489.018194 363.77579)">
+  <text class="s3" x="522.402192" y="363.77579" transform="rotate(-0 522.402192 363.77579)">
     $1
   </text>
 
   <path
     class="s2"
-    d="M 586.9131 348.177352 L 586.9131 52.689352"
+    d="M 605.919392 348.177352 L 605.919392 52.689352"
     clip-path="url(#cost-chart-p805e0188ab)"
   />
 
-  <text class="s3" x="586.9131" y="363.77579" transform="rotate(-0 586.9131 363.77579)">$2</text>
+  <text class="s3" x="605.919392" y="363.77579" transform="rotate(-0 605.919392 363.77579)">
+    $2
+  </text>
 
   <path
     class="s2"
@@ -256,7 +268,7 @@
     />
   </defs>
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="632.509174" y="93.053013" />
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="644.818827" y="93.053013" />
   </g>
 
   <defs>
@@ -267,39 +279,39 @@
     />
   </defs>
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="134.926828" y="114.741832" />
+    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="141.836623" y="114.032661" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="648.443994" y="124.611132" />
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="658.413319" y="124.611131" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="115.049199" y="131.584648" />
+    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="140.639694" y="133.830357" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="106.412207" y="134.184943" />
+    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="108.199785" y="134.539528" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="307.048323" y="140.685679" />
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="367.158013" y="140.685678" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="554.405875" y="141.513045" />
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="578.186464" y="141.513045" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="399.884702" y="161.310741" />
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="446.359627" y="161.310741" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="108.725821" y="164.7975" />
+    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="108.723492" y="166.74772" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="143.9876" y="233.232521" />
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="228.045819" y="233.23252" />
   </g>
 
   <defs>
@@ -310,153 +322,153 @@
     />
   </defs>
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s10" xlink:href="#cost-chart-md9d9376197" x="178.047519" y="242.038063" />
+    <use class="s10" xlink:href="#cost-chart-md9d9376197" x="134.137871" y="248.066018" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s10" xlink:href="#cost-chart-md9d9376197" x="122.433046" y="312.836988" />
+    <use class="s10" xlink:href="#cost-chart-md9d9376197" x="162.836496" y="319.042235" />
   </g>
 
   <g clip-path="url(#cost-chart-p805e0188ab)">
-    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="191.78675" y="339.726396" />
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="268.824766" y="339.726395" />
   </g>
 
-  <path class="s11" d="M 607.383731 82.800173 Q 617.16922 86.793299 626.954709 90.786425" />
+  <path class="s11" d="M 634.078827 81.66817 L 640.701589 88.688571" />
 
   <path
     class="s1"
-    d="M 559.92933 81.66817 L 621.769174 81.66817 L 621.769174 70.437857 L 559.92933 70.437857 z"
+    d="M 572.238983 81.66817 L 634.078827 81.66817 L 634.078827 70.437857 L 572.238983 70.437857 z"
   />
 
-  <text class="s12" x="620.509174" y="78.536451" transform="rotate(-0 620.509174 78.536451)">
+  <text class="s12" x="632.818827" y="78.536451" transform="rotate(-0 632.818827 78.536451)">
     GPT-5.6 terra
   </text>
 
-  <path class="s11" d="M 196.896105 97.212735 Q 168.799256 105.160422 140.702407 113.108109" />
+  <path class="s11" d="M 188.74 96.20975 L 147.445339 111.901393" />
 
   <path
     class="s1"
-    d="M 193.666828 96.396004 L 281.229796 96.396004 L 281.229796 75.087661 L 193.666828 75.087661 z"
+    d="M 188.74 96.20975 L 276.302968 96.20975 L 276.302968 74.901407 L 188.74 74.901407 z"
   />
 
-  <text class="s13" transform="translate(194.926828 83.186254)">WebMiner Model</text>
-  <text class="s13" transform="translate(194.926828 93.264286)">2B full</text>
+  <text class="s13" transform="translate(190 83)">WebMiner Model</text>
+  <text class="s13" transform="translate(190 93.078032)">2B full</text>
 
-  <path class="s11" d="M 663.457293 130.843109 Q 658.71982 128.876598 653.982348 126.910086" />
+  <path class="s11" d="M 671.153319 131.995974 L 663.604277 127.620111" />
 
   <path
     class="s1"
-    d="M 661.183994 143.226288 L 698.339932 143.226288 L 698.339932 131.995975 L 661.183994 131.995975 z"
+    d="M 671.153319 143.226287 L 708.309257 143.226287 L 708.309257 131.995974 L 671.153319 131.995974 z"
   />
 
-  <text class="s14" x="662.443994" y="140.094569" transform="rotate(-0 662.443994 140.094569)">
+  <text class="s14" x="672.413319" y="140.094568" transform="rotate(-0 672.413319 140.094568)">
     GPT-4.1
   </text>
 
-  <path class="s11" d="M 162.796745 128.553747 Q 141.917393 129.879119 121.038042 131.204491" />
+  <path class="s11" d="M 184.74 133.830357 L 146.639694 133.830357" />
 
   <path
     class="s1"
-    d="M 165.789199 136.23882 L 253.352167 136.23882 L 253.352167 114.930477 L 165.789199 114.930477 z"
+    d="M 184.74 139.20975 L 272.302968 139.20975 L 272.302968 117.901407 L 184.74 117.901407 z"
   />
 
-  <text class="s13" transform="translate(167.049199 123.02907)">WebMiner Model</text>
-  <text class="s13" transform="translate(167.049199 133.107102)">2B LoRA</text>
+  <text class="s13" transform="translate(186 126)">WebMiner Model</text>
+  <text class="s13" transform="translate(186 136.078032)">2B LoRA</text>
 
-  <path class="s11" d="M 122.902886 97.573947 Q 115.890523 113.142112 108.878159 128.710276" />
+  <path class="s11" d="M 108.199785 94.20975 L 108.199785 128.539528" />
 
   <path
     class="s1"
-    d="M 85.152207 94.839115 L 172.715176 94.839115 L 172.715176 73.530771 L 85.152207 73.530771 z"
+    d="M 64.74 94.20975 L 152.302969 94.20975 L 152.302969 72.901406 L 64.74 72.901406 z"
   />
 
-  <text class="s13" transform="translate(86.412207 81.629365)">WebMiner Model</text>
-  <text class="s13" transform="translate(86.412207 91.707396)">0.8B full</text>
+  <text class="s13" transform="translate(66 81)">WebMiner Model</text>
+  <text class="s13" transform="translate(66 91.078031)">0.8B full</text>
 
-  <path class="s11" d="M 325.697277 135.154557 Q 319.247999 137.067358 312.79872 138.98016" />
+  <path class="s11" d="M 377.898013 134.300834 L 372.31546 137.619617" />
 
   <path
     class="s1"
-    d="M 317.788323 134.300835 L 377.227698 134.300835 L 377.227698 123.070523 L 317.788323 123.070523 z"
+    d="M 377.898013 134.300834 L 437.337388 134.300834 L 437.337388 123.070522 L 377.898013 123.070522 z"
   />
 
-  <text class="s14" x="319.048323" y="131.169116" transform="rotate(-0 319.048323 131.169116)">
+  <text class="s14" x="379.158013" y="131.169115" transform="rotate(-0 379.158013 131.169115)">
     GPT-5.6 luna
   </text>
 
-  <path class="s11" d="M 538.372366 154.967907 Q 544.090371 150.169521 549.808376 145.371135" />
+  <path class="s11" d="M 567.446464 156.897889 L 574.752001 146.432848" />
 
   <path
     class="s1"
-    d="M 515.0965 168.128202 L 543.665875 168.128202 L 543.665875 156.897889 L 515.0965 156.897889 z"
+    d="M 538.877089 168.128202 L 567.446464 168.128202 L 567.446464 156.897889 L 538.877089 156.897889 z"
   />
 
-  <text class="s12" x="542.405875" y="164.996483" transform="rotate(-0 542.405875 164.996483)">
+  <text class="s12" x="566.186464" y="164.996483" transform="rotate(-0 566.186464 164.996483)">
     GPT-5
   </text>
 
-  <path class="s11" d="M 422.403527 169.654427 Q 413.957593 166.525035 405.511659 163.395644" />
+  <path class="s11" d="M 457.099627 170.695585 L 450.877724 165.258752" />
 
   <path
     class="s1"
-    d="M 410.624702 181.925898 L 470.11189 181.925898 L 470.11189 170.695585 L 410.624702 170.695585 z"
+    d="M 457.099627 181.925898 L 516.586815 181.925898 L 516.586815 170.695585 L 457.099627 170.695585 z"
   />
 
-  <text class="s14" x="411.884702" y="178.794179" transform="rotate(-0 411.884702 178.794179)">
+  <text class="s14" x="458.359627" y="178.794179" transform="rotate(-0 458.359627 178.794179)">
     GPT-4.1 mini
   </text>
 
-  <path class="s11" d="M 132.313036 173.143782 Q 123.34834 169.971645 114.383643 166.799507" />
+  <path class="s11" d="M 120.74 181.901406 L 112.451493 171.448998" />
 
   <path
     class="s1"
-    d="M 121.465821 195.451672 L 209.02879 195.451672 L 209.02879 174.143328 L 121.465821 174.143328 z"
+    d="M 120.74 203.20975 L 208.302969 203.20975 L 208.302969 181.901406 L 120.74 181.901406 z"
   />
 
-  <text class="s13" transform="translate(122.725821 182.241922)">WebMiner Model</text>
-  <text class="s13" transform="translate(122.725821 192.319953)">0.8B LoRA</text>
+  <text class="s13" transform="translate(122 190)">WebMiner Model</text>
+  <text class="s13" transform="translate(122 200.078031)">0.8B LoRA</text>
 
-  <path class="s11" d="M 118.159316 224.781145 Q 128.22169 228.073694 138.284064 231.366244" />
+  <path class="s11" d="M 228.045819 223.131719 L 228.045819 227.23252" />
 
   <path
     class="s1"
-    d="M 64.044475 223.847677 L 132.2476 223.847677 L 132.2476 212.617364 L 64.044475 212.617364 z"
+    d="M 218.056875 223.131719 L 286.26 223.131719 L 286.26 211.901406 L 218.056875 211.901406 z"
   />
 
-  <text class="s12" x="130.9876" y="220.715958" transform="rotate(-0 130.9876 220.715958)">
+  <text class="s12" x="285" y="220" transform="rotate(-0 285 220)">
     GPT-OSS-120B
   </text>
 
-  <path class="s11" d="M 205.98354 247.815463 Q 194.953381 245.534335 183.923222 243.253207" />
+  <path class="s11" d="M 148.74 258.901407 L 138.956214 251.641429" />
 
   <path
     class="s1"
-    d="M 190.787519 259.653219 L 281.35705 259.653219 L 281.35705 248.422907 L 190.787519 248.422907 z"
+    d="M 148.74 270.131719 L 239.309531 270.131719 L 239.309531 258.901407 L 148.74 258.901407 z"
   />
 
-  <text class="s14" x="192.047519" y="256.5215" transform="rotate(-0 192.047519 256.5215)">
+  <text class="s14" x="150" y="267" transform="rotate(-0 150 267)">
     Qwen3.5-0.8B 基座
   </text>
 
-  <path class="s11" d="M 132.190904 311.747363 Q 130.292219 311.959382 128.393535 312.171402" />
+  <path class="s11" d="M 183.74 313.131719 L 168.610135 317.409725" />
 
   <path
     class="s1"
-    d="M 135.173046 312.452144 L 217.156015 312.452144 L 217.156015 301.221831 L 135.173046 301.221831 z"
+    d="M 183.74 313.131719 L 265.722969 313.131719 L 265.722969 301.901406 L 183.74 301.901406 z"
   />
 
-  <text class="s14" x="136.433046" y="309.320425" transform="rotate(-0 136.433046 309.320425)">
+  <text class="s14" x="185" y="310" transform="rotate(-0 185 310)">
     Qwen3.5-2B 基座
   </text>
 
-  <path class="s11" d="M 211.22672 334.167217 Q 204.389982 336.122294 197.553245 338.077372" />
+  <path class="s11" d="M 279.564766 333.341551 L 273.982214 336.660334" />
 
   <path
     class="s1"
-    d="M 202.52675 333.341552 L 264.972687 333.341552 L 264.972687 322.111239 L 202.52675 322.111239 z"
+    d="M 279.564766 333.341551 L 342.010703 333.341551 L 342.010703 322.111238 L 279.564766 322.111238 z"
   />
 
-  <text class="s14" x="203.78675" y="330.209833" transform="rotate(-0 203.78675 330.209833)">
+  <text class="s14" x="280.824766" y="330.209832" transform="rotate(-0 280.824766 330.209832)">
     GPT-4.1 nano
   </text>
 
@@ -506,8 +518,8 @@
   </text>
 
   <defs>
-    <clippath id="cost-chart-p805e0188ab">
+    <clipPath id="cost-chart-p805e0188ab">
       <rect x="51.043125" y="52.689352" width="665.28" height="295.488" />
-    </clippath>
+    </clipPath>
   </defs>
 </svg>

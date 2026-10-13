@@ -80,7 +80,7 @@
               On the test set, the fully fine-tuned 2B WebMiner Model exceeds GPT-5.6 luna in
               extraction quality and approaches GPT-5.6 terra. In this test, the estimated local
               generation cost of the fully fine-tuned 2B model is approximately </span
-            ><strong>3%</strong><span data-zh="。"> of GPT-5.6 terra's API charges. </span>
+            ><strong>1.54%</strong><span data-zh="。"> of GPT-5.6 terra's API charges. </span>
           </p>
         </div>
         <nav data-zh-aria-label="报告目录" class="contents" aria-label="Report contents">
@@ -612,11 +612,11 @@
               ><span data-zh=" 评测结果 "> Evaluation results </span>
             </h2>
             <p
-              data-zh=" 表 1 列出本次选定的 13 款模型，按测试集离线得分排序。WebMiner Model 2B full 得分 79.50，在这组模型中排名第 2，比 GPT-4.1 高 1.67 分，比 GPT-5.6 terra 低 3.67 分。 "
+              data-zh=" 表 1 列出本次选定的 13 款模型，按测试集离线得分排序。WebMiner Model 2B full 得分 79.62，在这组模型中排名第 2，比 GPT-4.1 高 1.79 分，比 GPT-5.6 terra 低 3.55 分。 "
             >
               Table 1 lists the 13 selected models in descending order of test-set score. WebMiner
-              Model 2B full scores 79.50 and ranks second in this group, 1.67 points above GPT-4.1
-              and 3.67 points below GPT-5.6 terra.
+              Model 2B full scores 79.62 and ranks second in this group, 1.79 points above GPT-4.1
+              and 3.55 points below GPT-5.6 terra.
             </p>
           </div>
           <figure class="figure chart-figure">
@@ -686,10 +686,10 @@
                   <td>2</td>
                   <th scope="row">WebMiner Model 2B full</th>
                   <td data-zh=" 关闭 ">Off</td>
-                  <td class="num">79.50</td>
+                  <td class="num">79.62</td>
                   <td class="num">0</td>
                   <td class="num">
-                    ≈$0.0815<small data-zh=" 147.5 秒；$1.99/h "> 147.5 s; $1.99/h </small>
+                    ≈$0.04249
                   </td>
                 </tr>
                 <tr>
@@ -704,20 +704,20 @@
                   <td>4</td>
                   <th scope="row">WebMiner Model 2B LoRA</th>
                   <td data-zh=" 关闭 ">Off</td>
-                  <td class="num">76.65</td>
+                  <td class="num">76.27</td>
                   <td class="num">0</td>
                   <td class="num">
-                    ≈$0.0708<small data-zh=" 128.1 秒；$1.99/h "> 128.1 s; $1.99/h </small>
+                    ≈$0.04207
                   </td>
                 </tr>
                 <tr class="ours">
                   <td>5</td>
                   <th scope="row">WebMiner Model 0.8B full</th>
                   <td data-zh=" 关闭 ">Off</td>
-                  <td class="num">76.21</td>
+                  <td class="num">76.15</td>
                   <td class="num">0</td>
                   <td class="num">
-                    ≈$0.0666<small data-zh=" 120.5 秒；$1.99/h "> 120.5 s; $1.99/h </small>
+                    ≈$0.03214
                   </td>
                 </tr>
                 <tr>
@@ -748,10 +748,10 @@
                   <td>9</td>
                   <th scope="row">WebMiner Model 0.8B LoRA</th>
                   <td data-zh=" 关闭 ">Off</td>
-                  <td class="num">71.03</td>
+                  <td class="num">70.70</td>
                   <td class="num">0</td>
                   <td class="num">
-                    ≈$0.0677<small data-zh=" 122.5 秒；$1.99/h "> 122.5 s; $1.99/h </small>
+                    ≈$0.03228
                   </td>
                 </tr>
                 <tr>
@@ -766,20 +766,20 @@
                   <td>11</td>
                   <th data-zh=" Qwen3.5-0.8B 基座 " scope="row">Qwen3.5-0.8B base</th>
                   <td data-zh=" 关闭 ">Off</td>
-                  <td class="num">57.96</td>
+                  <td class="num">56.94</td>
                   <td class="num">0</td>
                   <td class="num">
-                    ≈$0.1106<small data-zh=" 200.0 秒；$1.99/h "> 200.0 s; $1.99/h </small>
+                    ≈$0.03986
                   </td>
                 </tr>
                 <tr>
                   <td>12</td>
                   <th data-zh=" Qwen3.5-2B 基座 " scope="row">Qwen3.5-2B base</th>
                   <td data-zh=" 关闭 ">Off</td>
-                  <td class="num">45.98</td>
+                  <td class="num">44.93</td>
                   <td class="num">0</td>
                   <td class="num">
-                    ≈$0.0746<small data-zh=" 134.9 秒；$1.99/h "> 134.9 s; $1.99/h </small>
+                    ≈$0.05058
                   </td>
                 </tr>
                 <tr>
@@ -845,20 +845,20 @@
                 <strong data-zh=" 微调模型高于对应基座。 ">
                   Fine-tuned models outperform their corresponding base models. </strong
                 ><span
-                  data-zh=" 2B full / LoRA 相对 2B 基座分别高 33.52 / 30.67 分；0.8B full / LoRA 相对 0.8B 基座分别高 18.25 / 13.07 分。 "
+                  data-zh=" 2B full / LoRA 相对 2B 基座分别高 34.69 / 31.34 分；0.8B full / LoRA 相对 0.8B 基座分别高 19.21 / 13.76 分。 "
                 >
-                  The 2B full and LoRA models exceed the 2B base by 33.52 and 30.67 points,
-                  respectively. The 0.8B full and LoRA models exceed the 0.8B base by 18.25 and
-                  13.07 points, respectively.
+                  The 2B full and LoRA models exceed the 2B base by 34.69 and 31.34 points,
+                  respectively. The 0.8B full and LoRA models exceed the 0.8B base by 19.21 and
+                  13.76 points, respectively.
                 </span>
               </li>
               <li>
                 <strong data-zh=" 同规模下 full 得分更高。 ">
                   Full fine-tuning scores higher at the same model size. </strong
                 ><span
-                  data-zh=" 2B full 比 2B LoRA 高 2.85 分，0.8B full 比 0.8B LoRA 高 5.18 分。两种方法的学习率和更新参数范围不同。 "
+                  data-zh=" 2B full 比 2B LoRA 高 3.35 分，0.8B full 比 0.8B LoRA 高 5.45 分。两种方法的学习率和更新参数范围不同。 "
                 >
-                  2B full exceeds 2B LoRA by 2.85 points, and 0.8B full exceeds 0.8B LoRA by 5.18
+                  2B full exceeds 2B LoRA by 3.35 points, and 0.8B full exceeds 0.8B LoRA by 5.45
                   points. The two methods differ in learning rate and which parameters are updated.
                 </span>
               </li>
@@ -867,11 +867,10 @@
                   In this evaluation, the fully fine-tuned 0.8B model has the lowest estimated
                   generation cost. </strong
                 ><span
-                  data-zh=" 100 条耗时 120.5 秒，折算约 $0.0666，得分 76.21；2B full 耗时 147.5 秒，折算约 $0.0815，得分 79.50。 "
+                  data-zh=" 每 100 条的估算生成成本约为 $0.03214，得分 76.15；2B full 的估算生成成本约为 $0.04249，得分 79.62。 "
                 >
-                  Generating 100 examples takes 120.5 seconds, costing approximately $0.0666 at a
-                  score of 76.21. 2B full takes 147.5 seconds, costing approximately $0.0815 at a
-                  score of 79.50.
+                  The estimated generation cost per 100 examples is approximately $0.03214 at a
+                  score of 76.15. For 2B full, it is approximately $0.04249 at a score of 79.62.
                 </span>
               </li>
             </ul>
