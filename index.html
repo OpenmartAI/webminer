@@ -68,19 +68,19 @@
           <h2 data-zh=" 摘要 ">Abstract</h2>
           <p>
             <span
-              data-zh=" WebMiner 面向商家网页信息提取任务，对开源权重的小规模语言模型进行后训练，实现高质量、低成本的结构化数据提取。 上游任务将 Google Maps 店铺登记网站的 HTML 转换为 Markdown，模型以网站 URL 和完整 Markdown 为输入，提取商家主体、联系方式、业务描述和人员信息。 训练方法由直接学习最终结构化结果的监督微调（SFT），发展为结合主体识别等中间任务与综合输出的五任务混合 SFT。 在测试集上，WebMiner Model 的 2B 全量微调版本在提取质量上超过 GPT-5.6 luna，接近 GPT-5.6 terra； 本地生成成本估算约为 GPT-5.6 terra API 费用的 "
+              data-zh=" WebMiner 面向商家网页信息提取任务，对开源权重的小规模语言模型进行后训练，实现高质量、低成本的结构化数据提取。 上游系统访问 Google Maps 商家资料中登记的网站，并将网页 HTML 转换为 Markdown，模型以网站 URL 和完整 Markdown 为输入，提取商家主体、联系方式、业务描述和人员信息。 训练方法由直接学习最终结构化结果的监督微调（SFT），发展为结合主体识别等中间任务与综合输出的五任务混合 SFT。 在测试集上，WebMiner Model 的 2B 全量微调版本在提取质量上超过 GPT-5.6 luna，接近 GPT-5.6 terra。 在本次测试中，2B 全量微调版本的本地生成成本估算约为 GPT-5.6 terra API 费用的 "
             >
               WebMiner post-trains small, open-weight language models for high-quality, low-cost
-              structured data extraction from business websites. An upstream task converts the HTML
-              of websites listed by businesses on Google Maps into Markdown. Given the website URL
-              and complete Markdown, the model extracts business identity, contact details,
-              descriptions, and staff information. Our training approach evolved from supervised
+              structured data extraction from business websites. The upstream system visits websites
+              listed in Google Maps business profiles and converts their HTML into Markdown. Given
+              the website URL and complete Markdown, the model extracts business identity, contact
+              details, descriptions, and staff information. Our training approach evolved from supervised
               fine-tuning (SFT) on final structured answers to five-task mixed SFT that combines
               intermediate tasks, such as business identification, with the final extraction task.
               On the test set, the fully fine-tuned 2B WebMiner Model exceeds GPT-5.6 luna in
-              extraction quality and approaches GPT-5.6 terra, with estimated local generation costs
-              of approximately </span
-            ><strong>1/33</strong><span data-zh=" 。 "> of GPT-5.6 terra's API charges. </span>
+              extraction quality and approaches GPT-5.6 terra. In this test, the estimated local
+              generation cost of the fully fine-tuned 2B model is approximately </span
+            ><strong>3%</strong><span data-zh="。"> of GPT-5.6 terra's API charges. </span>
           </p>
         </div>
         <nav data-zh-aria-label="报告目录" class="contents" aria-label="Report contents">
@@ -96,14 +96,14 @@
               ><span data-zh=" 背景与任务定义 "> Background and task definition </span>
             </h2>
             <p
-              data-zh=" 上游系统按地理区域扫描 Google Maps，保存店铺信息，再访问店铺登记的网站 URL，取得 HTML 并转换为 Markdown。WebMiner 处理这些已经保存的文本，目标是将分散在网页中的商家信息转换为统一的结构化对象。Google Maps 中的目标店铺是归属判断的锚点，网站 URL 与 Markdown 是模型读取的证据。 "
+              data-zh=" 上游系统按地理区域扫描 Google Maps，保存店铺信息，再访问店铺登记的网站 URL，取得 HTML 并转换为 Markdown。WebMiner 处理这些已经保存的文本，目标是将分散在网页中的商家信息转换为统一的结构化对象。以 Google Maps 中的目标店铺为参照，判断网页信息的归属；网站 URL 与 Markdown 是模型读取的证据。 "
             >
               The upstream system scans geographic regions on Google Maps, saves business listings,
               and visits their registered website URLs to retrieve HTML and convert it into
               Markdown. WebMiner processes this saved text to turn scattered business information
-              into a consistent structured object. The target Google Maps listing anchors decisions
-              about which business the information belongs to; the website URL and Markdown provide
-              the evidence available to the model.
+              into a consistent structured object. The target business listed on Google Maps serves
+              as the reference for determining which webpage information belongs to it; the website
+              URL and Markdown provide the evidence available to the model.
             </p>
           </div>
           <figure class="figure prose">
@@ -188,12 +188,12 @@
               2.1 Learning the final structured output directly
             </h3>
             <p
-              data-zh=" 早期 SFT 将网页输入与最终 teacher 对象配成监督样本：输入任务指令、URL 和 Markdown，模型学习生成完整结构化答案。训练使用标准的自回归监督目标，在给定输入和目标前缀的条件下，预测目标输出的下一个 token。训练样本同时覆盖有效页面与无效页面，使模型既能按规定格式提取商家信息，也能在页面不适用时返回空结果。 "
+              data-zh=" 早期 SFT 将网页输入与教师模型生成的最终结构化答案配成监督样本：输入任务指令、URL 和 Markdown，模型学习生成完整结构化答案。训练使用标准的自回归监督目标，在给定输入和目标前缀的条件下，预测目标输出的下一个 token。训练样本同时覆盖有效页面与无效页面，使模型既能按规定格式提取商家信息，也能在页面不适用时返回空结果。 "
             >
-              Early SFT paired webpage inputs with final teacher-generated objects. Given the task
-              instructions, URL, and Markdown, the model learned to generate the complete structured
-              answer. Training used the standard autoregressive objective: predicting the next
-              target token conditioned on the input and preceding target tokens. The examples
+              Early SFT paired webpage inputs with final structured answers generated by a teacher
+              model. Given the task instructions, URL, and Markdown, the model learned to generate
+              the complete structured answer. Training used the standard autoregressive objective:
+              predicting the next target token conditioned on the input and preceding target tokens. The examples
               included both valid and invalid pages, teaching the model to extract business
               information in the required format and to return a null result when a page was
               unsuitable.
@@ -238,7 +238,7 @@
               2.2 Decomposing extraction into independent supervised tasks
             </h3>
             <p
-              data-zh=" 我们首先为主体识别、联系方式提取、人员提取和业务描述构建四个分步监督任务，再加入直接生成最终结构化结果的综合输出任务，形成五任务混合 SFT。 其中，联系方式提取、人员提取和业务描述均以已确认的商家主体为上下文，分别学习各自的提取目标，彼此不依赖对方的输出。 综合输出任务仅以 URL 和完整 Markdown 为输入，不提供中间任务的答案，使模型同时学习端到端的信息提取能力。 "
+              data-zh=" 我们首先为主体识别、联系方式提取、人员提取和业务描述构建四个分步监督任务，再加入直接生成最终结构化结果的综合输出任务，形成五任务混合 SFT。 其中，联系方式提取、人员提取和业务描述均以已确认的商家主体为上下文，分别学习各自的提取目标，彼此不依赖对方的输出。 综合输出任务仅以 URL 和完整 Markdown 为输入，不提供中间任务的参考答案，使模型同时学习端到端的信息提取能力。 "
             >
               We first construct four supervised tasks: business identification, contact extraction,
               staff extraction, and business description. Adding a task that directly generates the
@@ -246,7 +246,8 @@
               extraction, and business description each receive the confirmed business identity as
               context and learn their own targets independently, without relying on one another's
               outputs. The combined task receives only the URL and complete Markdown, with no
-              intermediate answers, so the model also learns end-to-end extraction.
+              reference answers for intermediate tasks, so the model also learns end-to-end
+              extraction.
             </p>
           </div>
           <figure class="figure prose">
@@ -269,8 +270,9 @@
                 </div>
                 <div class="arrow" aria-hidden="true">→</div>
                 <div>
-                  <p data-zh=" 各自一条训练对话，不互读结果 " class="branch-context">
-                    Separate training conversations; no shared outputs
+                  <p data-zh=" 每项任务分别构建训练对话，不使用其他提取任务的输出 " class="branch-context">
+                    Each task has a separate training conversation and does not use outputs from
+                    other extraction tasks
                   </p>
                   <div class="task-branches">
                     <span data-zh=" 联系方式 "> Contact details </span
@@ -282,8 +284,8 @@
               <div class="method-row">
                 <div data-zh=" 综合监督 " class="method-label">Combined supervision</div>
                 <div class="method-box">
-                  URL + Markdown<small data-zh=" 不包含中间 teacher 答案 ">
-                    No intermediate teacher answers
+                  URL + Markdown<small data-zh=" 不提供中间任务的参考答案 ">
+                    No reference answers for intermediate tasks
                   </small>
                 </div>
                 <div class="arrow" aria-hidden="true">→</div>
@@ -340,7 +342,9 @@
                   <td data-zh=" 原始资料、已确认主体、联系候选 ">
                     Source material, confirmed identity, and contact candidates
                   </td>
-                  <td data-zh=" 接受的 emails 与 phones ">Accepted emails and phone numbers</td>
+                  <td data-zh=" 经确认属于目标商家的邮箱和电话号码 ">
+                    Email addresses and phone numbers confirmed to belong to the target business
+                  </td>
                 </tr>
                 <tr>
                   <th data-zh=" 业务描述 " scope="row">Business description</th>
@@ -558,13 +562,14 @@
             </div>
             <h3 data-zh=" 3.3 评测与成本口径 ">3.3 Evaluation and cost accounting</h3>
             <p
-              data-zh=" 所有模型使用同一测试集。每次请求只提供网站 URL 和完整 Markdown，由模型一次生成最终的结构化结果，不提供中间任务的答案。 生成结果按照统一规则与预先固定的参考答案进行比较，得到百分制得分。请求失败、未能生成结果或输出未通过格式校验的样本均计为 0 分。 "
+              data-zh=" 所有模型使用同一测试集。每次请求只提供网站 URL 和完整 Markdown，由模型一次生成最终的结构化结果，不提供中间任务的参考答案。 生成结果按照统一规则与预先固定的参考答案进行比较，得到百分制得分。请求失败、未能生成结果或输出未通过格式校验的样本均计为 0 分。 "
             >
               All models use the same test set. Each request provides only the website URL and
               complete Markdown, and the model generates the final structured result in one pass
-              without intermediate answers. Results are compared with fixed reference answers using
-              a common scoring procedure, yielding a score out of 100. Failed requests, generation
-              failures, and outputs that fail format validation receive zero points.
+              without reference answers for intermediate tasks. Results are compared with fixed
+              reference answers using a common scoring procedure, yielding a score out of 100.
+              Failed requests, generation failures, and outputs that fail format validation receive
+              zero points.
             </p>
             <p
               data-zh=" 评测时尽可能关闭模型的思考功能；无法关闭的模型使用其支持的最低档位，其中 GPT-5 使用 minimal，GPT-OSS-120B 使用 low，GPT-4.1 系列不支持该功能。 各模型的实际设置列在结果表中。 "
@@ -858,8 +863,9 @@
                 </span>
               </li>
               <li>
-                <strong data-zh=" 0.8B full 的本轮生成估算成本最低。 ">
-                  0.8B full has the lowest estimated generation cost in this evaluation. </strong
+                <strong data-zh=" 在本次评测中，0.8B 全量微调版本的估算生成成本最低。 ">
+                  In this evaluation, the fully fine-tuned 0.8B model has the lowest estimated
+                  generation cost. </strong
                 ><span
                   data-zh=" 100 条耗时 120.5 秒，折算约 $0.0666，得分 76.21；2B full 耗时 147.5 秒，折算约 $0.0815，得分 79.50。 "
                 >
