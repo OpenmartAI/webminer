@@ -238,12 +238,12 @@
               2.2 Decomposing extraction into independent supervised tasks
             </h3>
             <p
-              data-zh=" 同一项网页提取任务可以直接学习最终结果，也可以拆开学习各步判断。E2E 任务以 URL 和完整 Markdown 为输入，一次生成最终结构化结果。分步任务先通过 identify-main-entity 识别商家主体并判断 store 是否有效；若 store 无效，直接返回 info=null，跳过后续提取与组合。有效时，再将主体结果与原始资料一起提供给联系方式、业务描述和人员提取三个任务。三项任务分别围绕同一主体提取信息，彼此不依赖对方的输出；主体信息与三项提取结果共同组成最终结果。 "
+              data-zh=" 同一项网页提取任务可以直接学习最终结果，也可以拆开学习各步判断。E2E 任务以 URL 和完整 Markdown 为输入，一次生成最终结构化结果。分步任务先识别商家主体并判断 store 是否有效；若 store 无效，直接返回 info=null，跳过后续提取与组合。有效时，再将主体结果与原始资料一起提供给联系方式、业务描述和人员提取三个任务。三项任务分别围绕同一主体提取信息，彼此不依赖对方的输出；主体信息与三项提取结果共同组成最终结果。 "
             >
               The same webpage extraction task can be learned directly from its final result or
               decomposed into individual decisions. The E2E task takes the URL and complete Markdown
               and generates the final structured result in one pass. The stepwise tasks first identify
-              the business and determine whether the store is valid with identify-main-entity. An
+              the business and determine whether the store is valid. An
               invalid store returns info=null immediately, skipping further extraction and assembly.
               For a valid store, the identity result and source material are supplied to three tasks:
               contact extraction, business description, and staff extraction. Each extracts information
@@ -290,7 +290,6 @@
                       <strong data-zh=" 主体识别（前置任务） ">
                         Business identification (prerequisite)
                       </strong>
-                      <code>identify-main-entity</code>
                       <div class="identity-result">
                         <strong data-zh=" 输出：商家主体与有效性判断 ">
                           Output: business identity and validity
@@ -398,10 +397,15 @@
             role="region"
             aria-label="Inputs and training targets for the five tasks"
           >
-            <table class="task-table">
+            <table class="task-table" id="supervision-table">
               <caption data-zh=" 五任务监督的输入与目标 ">
                 Inputs and targets for five-task supervision
               </caption>
+              <colgroup>
+                <col class="task-name-column" />
+                <col class="task-input-column" />
+                <col class="task-target-column" />
+              </colgroup>
               <thead>
                 <tr>
                   <th data-zh=" 任务 " scope="col">Task</th>
@@ -411,10 +415,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row">
-                    <span data-zh=" 主体识别 ">Business identification</span><br />
-                    <code>identify-main-entity</code>
-                  </th>
+                  <th data-zh=" 主体识别 " scope="row">Business identification</th>
                   <td data-zh=" URL、完整 Markdown ">URL and complete Markdown</td>
                   <td data-zh=" 六个主体字段 ">Six identity fields</td>
                 </tr>
@@ -437,7 +438,7 @@
                   <td data-zh=" 原始资料、已确认主体 ">Source material and confirmed identity</td>
                   <td data-zh=" 人员及职位，最多 20 人 ">Names and roles, up to 20 people</td>
                 </tr>
-                <tr>
+                <tr class="task-e2e">
                   <th data-zh=" 综合输出（E2E） " scope="row">Combined output (E2E)</th>
                   <td data-zh=" URL、完整 Markdown ">URL and complete Markdown</td>
                   <td>

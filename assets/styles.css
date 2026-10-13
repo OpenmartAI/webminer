@@ -331,12 +331,6 @@ code {
 .e2e-task {
   padding: 24px 12px;
 }
-.identity-task > code {
-  display: inline-block;
-  margin-top: 5px;
-  background: transparent;
-  color: var(--blue);
-}
 .identity-result {
   border-top: 1px solid #d5e1eb;
   padding-top: 8px;
@@ -575,7 +569,37 @@ tbody th {
   line-height: 1.85;
 }
 .task-table {
-  min-width: 680px;
+  min-width: 780px;
+  table-layout: fixed;
+}
+.task-table .task-name-column {
+  width: 26%;
+}
+.task-table .task-input-column {
+  width: 32%;
+}
+.task-table .task-target-column {
+  width: 42%;
+}
+.task-table caption {
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+.task-table th,
+.task-table td {
+  padding: 14px 16px;
+}
+.task-table tbody th {
+  font-weight: 600;
+}
+.task-table td {
+  color: #454e58;
+}
+.task-table .task-e2e {
+  background: #f3f7fb;
+}
+.task-table .task-e2e th {
+  color: var(--blue);
 }
 .data-table {
   min-width: 700px;
