@@ -234,82 +234,160 @@
               final result. The aim is to support learning the complete extraction task by teaching
               the capabilities required at each step.
             </p>
-            <h3 data-zh=" 2.2 将提取过程拆为独立监督任务 ">
+            <h3 id="supervision-tasks" data-zh=" 2.2 将提取过程拆为独立监督任务 ">
               2.2 Decomposing extraction into independent supervised tasks
             </h3>
             <p
-              data-zh=" 我们首先为主体识别、联系方式提取、人员提取和业务描述构建四个分步监督任务，再加入直接生成最终结构化结果的综合输出任务，形成五任务混合 SFT。 其中，联系方式提取、人员提取和业务描述均以已确认的商家主体为上下文，分别学习各自的提取目标，彼此不依赖对方的输出。 综合输出任务仅以 URL 和完整 Markdown 为输入，不提供中间任务的参考答案，使模型同时学习端到端的信息提取能力。 "
+              data-zh=" 同一项网页提取任务可以直接学习最终结果，也可以拆开学习各步判断。E2E 任务以 URL 和完整 Markdown 为输入，一次生成最终结构化结果。分步任务先通过 identify-main-entity 识别商家主体并判断 store 是否有效；若 store 无效，直接返回 info=null，跳过后续提取与组合。有效时，再将主体结果与原始资料一起提供给联系方式、业务描述和人员提取三个任务。三项任务分别围绕同一主体提取信息，彼此不依赖对方的输出；主体信息与三项提取结果共同组成最终结果。 "
             >
-              We first construct four supervised tasks: business identification, contact extraction,
-              staff extraction, and business description. Adding a task that directly generates the
-              final structured result yields five-task mixed SFT. Contact extraction, staff
-              extraction, and business description each receive the confirmed business identity as
-              context and learn their own targets independently, without relying on one another's
-              outputs. The combined task receives only the URL and complete Markdown, with no
-              reference answers for intermediate tasks, so the model also learns end-to-end
-              extraction.
+              The same webpage extraction task can be learned directly from its final result or
+              decomposed into individual decisions. The E2E task takes the URL and complete Markdown
+              and generates the final structured result in one pass. The stepwise tasks first identify
+              the business and determine whether the store is valid with identify-main-entity. An
+              invalid store returns info=null immediately, skipping further extraction and assembly.
+              For a valid store, the identity result and source material are supplied to three tasks:
+              contact extraction, business description, and staff extraction. Each extracts information
+              about the same business independently of the other tasks' outputs.
+              The identity and the three extraction results together form the final result.
             </p>
           </div>
-          <figure class="figure prose">
+          <figure class="figure method-figure" id="supervision-diagram">
             <div class="method-diagram">
-              <div class="method-row">
-                <div data-zh=" 主体监督 " class="method-label">Identity supervision</div>
-                <div class="method-box">URL + Markdown</div>
-                <div class="arrow" aria-hidden="true">→</div>
-                <div class="method-box">
-                  <span data-zh=" 主体识别目标 "> Business identification target </span
-                  ><small data-zh=" 身份、服务状态与内容特征 ">
-                    Identity, service status, and content characteristics
-                  </small>
+              <div class="method-columns">
+                <div class="method-lane">
+                  <div class="method-heading">
+                    <h4 data-zh=" E2E · 端到端提取 ">E2E · End-to-end extraction</h4>
+                    <span data-zh=" 1 个监督任务 ">1 supervised task</span>
+                  </div>
+                  <div class="method-flow">
+                    <div class="method-box method-input">URL + Markdown</div>
+                    <div class="flow-arrow flow-arrow-long" aria-hidden="true"></div>
+                    <div class="method-box method-task e2e-task">
+                      <strong data-zh=" 直接生成完整结果 ">Generate the complete result</strong>
+                      <small data-zh=" 一次请求，完成全部字段提取 ">
+                        Extract all fields in a single request
+                      </small>
+                      <small data-zh=" 不提供中间任务的参考答案 ">
+                        No reference answers for intermediate tasks
+                      </small>
+                    </div>
+                    <div class="flow-arrow flow-arrow-long" aria-hidden="true"></div>
+                    <div class="method-box method-output">
+                      <strong data-zh=" 最终结构化结果 ">Final structured result</strong>
+                      <code>info</code>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="method-row">
-                <div data-zh=" 三项独立监督 " class="method-label">Three independent tasks</div>
-                <div data-zh=" 原始资料 + 已确认主体 " class="method-box">
-                  Source material + confirmed identity
-                </div>
-                <div class="arrow" aria-hidden="true">→</div>
-                <div>
-                  <p data-zh=" 每项任务分别构建训练对话，不使用其他提取任务的输出 " class="branch-context">
-                    Each task has a separate training conversation and does not use outputs from
-                    other extraction tasks
-                  </p>
-                  <div class="task-branches">
-                    <span data-zh=" 联系方式 "> Contact details </span
-                    ><span data-zh=" 业务描述 "> Business description </span
-                    ><span data-zh=" 人员信息 "> Staff information </span>
+                <div class="method-lane">
+                  <div class="method-heading">
+                    <h4 data-zh=" 分步 · 先识别，再提取 ">Stepwise · Identify, then extract</h4>
+                    <span data-zh=" 4 个监督任务 ">4 supervised tasks</span>
+                  </div>
+                  <div class="method-flow">
+                    <div class="method-box method-input">URL + Markdown</div>
+                    <div class="flow-arrow" aria-hidden="true"></div>
+                    <div class="method-box method-task identity-task">
+                      <strong data-zh=" 主体识别（前置任务） ">
+                        Business identification (prerequisite)
+                      </strong>
+                      <code>identify-main-entity</code>
+                      <div class="identity-result">
+                        <strong data-zh=" 输出：商家主体与有效性判断 ">
+                          Output: business identity and validity
+                        </strong>
+                        <small data-zh=" 身份、服务状态与内容特征 ">
+                          Identity, service status, and content characteristics
+                        </small>
+                      </div>
+                    </div>
+                    <div class="identity-outcomes">
+                      <div class="method-box identity-outcome identity-valid">
+                        <strong data-zh=" store 有效 ">Valid store</strong>
+                        <small data-zh=" 基于已确认主体继续提取 ">
+                          Continue extraction using the confirmed identity
+                        </small>
+                      </div>
+                      <div class="method-box identity-outcome identity-null">
+                        <strong data-zh=" store 无效 → 直接返回 ">Invalid store → return</strong>
+                        <code>{"info": null}</code>
+                        <small data-zh=" 结束，不进行后续分析 ">Stop; skip further analysis</small>
+                      </div>
+                    </div>
+                    <div class="valid-continuation" aria-hidden="true">
+                      <div class="flow-arrow"></div>
+                    </div>
+                    <p data-zh=" 原始资料 + 主体结果，作为每项任务的输入 " class="branch-context">
+                      Source material + identity result as input to each task
+                    </p>
+                    <svg
+                      class="branch-connector"
+                      viewBox="0 0 300 24"
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="M 150 0 V 10 M 50 20 V 10 H 250 V 20 M 150 10 V 20" />
+                      <path
+                        class="connector-head"
+                        d="M 47 18 L 50 24 L 53 18 Z M 147 18 L 150 24 L 153 18 Z M 247 18 L 250 24 L 253 18 Z"
+                      />
+                    </svg>
+                    <div class="task-branches">
+                      <div class="method-box method-task">
+                        <strong data-zh=" 联系方式 ">Contact details</strong>
+                        <small data-zh=" 邮箱 · 电话 ">Email · Phone</small>
+                      </div>
+                      <div class="method-box method-task">
+                        <strong data-zh=" 业务描述 ">Business description</strong>
+                        <small data-zh=" 六个描述字段 ">Six description fields</small>
+                      </div>
+                      <div class="method-box method-task">
+                        <strong data-zh=" 人员信息 ">Staff information</strong>
+                        <small data-zh=" 姓名 · 职位 ">Names · Roles</small>
+                      </div>
+                    </div>
+                    <svg
+                      class="branch-connector"
+                      viewBox="0 0 300 24"
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="M 50 0 V 10 H 250 V 0 M 150 0 V 20" />
+                      <path class="connector-head" d="M 147 18 L 150 24 L 153 18 Z" />
+                    </svg>
+                    <div class="method-box method-merge">
+                      <strong data-zh=" 组合字段 ">Assemble the fields</strong>
+                      <small data-zh=" 主体 + 联系方式 + 描述 + 人员 ">
+                        Identity + Contacts + Description + Staff
+                      </small>
+                    </div>
+                    <div class="flow-arrow" aria-hidden="true"></div>
+                    <div class="method-box method-output">
+                      <strong data-zh=" 最终结构化结果 ">Final structured result</strong>
+                      <code>info</code>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="method-row">
-                <div data-zh=" 综合监督 " class="method-label">Combined supervision</div>
-                <div class="method-box">
-                  URL + Markdown<small data-zh=" 不提供中间任务的参考答案 ">
-                    No reference answers for intermediate tasks
-                  </small>
-                </div>
-                <div class="arrow" aria-hidden="true">→</div>
-                <div data-zh=" 最终 info 对象 / null " class="method-box">
-                  Final info object / null
-                </div>
-              </div>
               <div
-                data-zh=" 五类记录 → 全局打乱 → 同一模型混合 SFT；评测综合任务时，一次请求直接生成最终结果。 "
+                data-zh=" 1 个 E2E 任务 + 4 个分步任务 → 五类监督记录混合训练同一模型 "
                 class="mix-note"
               >
-                Five types of records → global shuffle → mixed SFT of one model. Evaluation of the
-                combined task generates the final result in a single request.
+                1 E2E task + 4 stepwise tasks → five types of supervision mixed to train one model
               </div>
             </div>
             <figcaption>
-              <strong data-zh=" 图 2. 分步监督与综合监督的关系。 ">
-                Figure 2. Stepwise and combined supervision. </strong
+              <strong data-zh=" 图 2. E2E 与分步任务的输入、依赖和输出。 ">
+                Figure 2. Inputs, dependencies, and outputs of E2E and stepwise tasks. </strong
               ><span
-                data-zh=" “分步”指训练目标的分解。各任务记录在同一轮中混合训练；前置主体答案作为上下文时不重复计算损失。 "
+                data-zh=" 分步流程在主体识别后分支：store 有效时继续提取并组合字段；无效时直接返回 info=null，跳过后续分析。组合节点表示字段汇总，不是额外的监督任务。无效页面仅保留主体判断和 info=null 两类训练目标。本次评测采用左侧 E2E 路径，一次请求直接生成最终结果。 "
               >
-                Stepwise supervision decomposes the training targets. All task records are mixed
-                within the same epoch; preceding identity answers supplied as context do not
-                contribute additional loss.
+                After business identification, valid stores proceed to extraction and field assembly;
+                invalid stores return info=null directly, skipping further analysis. Assembly combines
+                fields and is not an additional supervised task. Invalid pages retain only identity and
+                info=null training targets. This evaluation uses the E2E path on the left to generate
+                the final result in a single request.
               </span>
             </figcaption>
           </figure>
@@ -333,7 +411,10 @@
               </thead>
               <tbody>
                 <tr>
-                  <th data-zh=" 主体识别 " scope="row">Business identification</th>
+                  <th scope="row">
+                    <span data-zh=" 主体识别 ">Business identification</span><br />
+                    <code>identify-main-entity</code>
+                  </th>
                   <td data-zh=" URL、完整 Markdown ">URL and complete Markdown</td>
                   <td data-zh=" 六个主体字段 ">Six identity fields</td>
                 </tr>
@@ -357,7 +438,7 @@
                   <td data-zh=" 人员及职位，最多 20 人 ">Names and roles, up to 20 people</td>
                 </tr>
                 <tr>
-                  <th data-zh=" 综合输出 " scope="row">Combined output</th>
+                  <th data-zh=" 综合输出（E2E） " scope="row">Combined output (E2E)</th>
                   <td data-zh=" URL、完整 Markdown ">URL and complete Markdown</td>
                   <td>
                     <code data-zh=' {"info": object 或 null} '> {"info": object or null} </code>
