@@ -1,0 +1,376 @@
+<svg
+  lang="en"
+  role="img"
+  aria-labelledby="score-chart-title score-chart-desc"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 736.615625 406.663975"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <title id="score-chart-title">Offline scores for 13 models</title>
+  <desc id="score-chart-desc">
+    Offline scores in descending order, with a zero baseline. Blue denotes WebMiner Model, gray
+    denotes API models, and brown denotes Qwen base models. Full values are in Table 1.
+  </desc>
+
+  <style>
+    * {
+      stroke-linejoin: round;
+      stroke-linecap: butt;
+    }
+    .s1 {
+      fill: #ffffff;
+    }
+    .s2 {
+      fill: none;
+      stroke: #e8ebee;
+      stroke-width: 0.7;
+      stroke-linecap: square;
+    }
+    .s3 {
+      fill: #59616b;
+      font: 10px "DejaVu Sans";
+      text-anchor: middle;
+    }
+    .s4 {
+      fill: #414852;
+      font: 10px "DejaVu Sans";
+      text-anchor: middle;
+    }
+    .s5 {
+      fill: #414852;
+      font: 10px "DejaVu Sans";
+      text-anchor: end;
+    }
+    .s6 {
+      fill: #2c659a;
+      font: 700 10px "DejaVu Sans";
+      text-anchor: end;
+    }
+    .s7 {
+      fill: none;
+      stroke: #ccd0d5;
+      stroke-width: 0.8;
+      stroke-linejoin: miter;
+      stroke-linecap: square;
+    }
+    .s8 {
+      fill: #939da8;
+    }
+    .s9 {
+      fill: #2c659a;
+    }
+    .s10 {
+      fill: #ba8756;
+    }
+    .s11 {
+      fill: #414852;
+      font: 10px "DejaVu Sans";
+      text-anchor: start;
+    }
+    .s12 {
+      fill: #2c659a;
+      font: 700 10px "DejaVu Sans";
+      text-anchor: start;
+    }
+    .s13 {
+      fill: none;
+      stroke: #2c659a;
+      stroke-width: 6;
+      stroke-linecap: square;
+    }
+    .s14 {
+      font: 10px "DejaVu Sans";
+      text-anchor: start;
+    }
+    .s15 {
+      fill: none;
+      stroke: #939da8;
+      stroke-width: 6;
+      stroke-linecap: square;
+    }
+    .s16 {
+      fill: none;
+      stroke: #ba8756;
+      stroke-width: 6;
+      stroke-linecap: square;
+    }
+  </style>
+  <path class="s1" d="M 0 406.663975 L 736.615625 406.663975 L 736.615625 0 L 0 0 z" />
+
+  <path
+    class="s1"
+    d="M 174.111875 365.167725 L 718.431875 365.167725 L 718.431875 42.607725 L 174.111875 42.607725 z"
+  />
+
+  <path
+    class="s2"
+    d="M 174.111875 365.167725 L 174.111875 42.607725"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <text class="s3" x="174.111875" y="376.266162" transform="rotate(-0 174.111875 376.266162)">
+    0
+  </text>
+
+  <path
+    class="s2"
+    d="M 282.975875 365.167725 L 282.975875 42.607725"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <text class="s3" x="282.975875" y="376.266162" transform="rotate(-0 282.975875 376.266162)">
+    20
+  </text>
+
+  <path
+    class="s2"
+    d="M 391.839875 365.167725 L 391.839875 42.607725"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <text class="s3" x="391.839875" y="376.266162" transform="rotate(-0 391.839875 376.266162)">
+    40
+  </text>
+
+  <path
+    class="s2"
+    d="M 500.703875 365.167725 L 500.703875 42.607725"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <text class="s3" x="500.703875" y="376.266162" transform="rotate(-0 500.703875 376.266162)">
+    60
+  </text>
+
+  <path
+    class="s2"
+    d="M 609.567875 365.167725 L 609.567875 42.607725"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <text class="s3" x="609.567875" y="376.266162" transform="rotate(-0 609.567875 376.266162)">
+    80
+  </text>
+
+  <path
+    class="s2"
+    d="M 718.431875 365.167725 L 718.431875 42.607725"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <text class="s3" x="718.431875" y="376.266162" transform="rotate(-0 718.431875 376.266162)">
+    100
+  </text>
+
+  <text class="s4" x="446.271875" y="395.944287" transform="rotate(-0 446.271875 395.944287)">
+    Offline score / 100
+  </text>
+
+  <text class="s5" x="164.111875" y="68.05058" transform="rotate(-0 164.111875 68.05058)">
+    GPT-5.6 terra
+  </text>
+
+  <text class="s6" x="164.111875" y="91.323307" transform="rotate(-0 164.111875 91.323307)">
+    WebMiner Model 2B full
+  </text>
+
+  <text class="s5" x="164.111875" y="114.596035" transform="rotate(-0 164.111875 114.596035)">
+    GPT-4.1
+  </text>
+
+  <text class="s6" x="164.111875" y="137.868762" transform="rotate(-0 164.111875 137.868762)">
+    WebMiner Model 2B LoRA
+  </text>
+
+  <text class="s6" x="164.111875" y="161.141489" transform="rotate(-0 164.111875 161.141489)">
+    WebMiner Model 0.8B full
+  </text>
+
+  <text class="s5" x="164.111875" y="184.414216" transform="rotate(-0 164.111875 184.414216)">
+    GPT-5.6 luna
+  </text>
+
+  <text class="s5" x="164.111875" y="207.686944" transform="rotate(-0 164.111875 207.686944)">
+    GPT-5
+  </text>
+
+  <text class="s5" x="164.111875" y="230.959671" transform="rotate(-0 164.111875 230.959671)">
+    GPT-4.1 mini
+  </text>
+
+  <text class="s6" x="164.111875" y="254.232398" transform="rotate(-0 164.111875 254.232398)">
+    WebMiner Model 0.8B LoRA
+  </text>
+
+  <text class="s5" x="164.111875" y="277.505126" transform="rotate(-0 164.111875 277.505126)">
+    GPT-OSS-120B
+  </text>
+
+  <text class="s5" x="164.111875" y="300.777853" transform="rotate(-0 164.111875 300.777853)">
+    Qwen3.5-0.8B base
+  </text>
+
+  <text class="s5" x="164.111875" y="324.05058" transform="rotate(-0 164.111875 324.05058)">
+    Qwen3.5-2B base
+  </text>
+
+  <text class="s5" x="164.111875" y="347.323307" transform="rotate(-0 164.111875 347.323307)">
+    GPT-4.1 nano
+  </text>
+
+  <path class="s7" d="M 174.111875 365.167725 L 718.431875 365.167725" />
+
+  <path
+    class="s8"
+    d="M 174.111875 57.269543 L 626.822819 57.269543 L 626.822819 71.23318 L 174.111875 71.23318 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s9"
+    d="M 174.111875 80.54227 L 606.846275 80.54227 L 606.846275 94.505907 L 174.111875 94.505907 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s8"
+    d="M 174.111875 103.814998 L 597.756131 103.814998 L 597.756131 117.778634 L 174.111875 117.778634 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s9"
+    d="M 174.111875 127.087725 L 591.333155 127.087725 L 591.333155 141.051361 L 174.111875 141.051361 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s9"
+    d="M 174.111875 150.360452 L 588.938147 150.360452 L 588.938147 164.324089 L 174.111875 164.324089 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s8"
+    d="M 174.111875 173.63318 L 582.950627 173.63318 L 582.950627 187.596816 L 174.111875 187.596816 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s8"
+    d="M 174.111875 196.905907 L 582.188579 196.905907 L 582.188579 210.869543 L 174.111875 210.869543 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s8"
+    d="M 174.111875 220.178634 L 563.953859 220.178634 L 563.953859 234.14227 L 174.111875 234.14227 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s9"
+    d="M 174.111875 243.451361 L 560.742371 243.451361 L 560.742371 257.414998 L 174.111875 257.414998 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s8"
+    d="M 174.111875 266.724089 L 497.710115 266.724089 L 497.710115 280.687725 L 174.111875 280.687725 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s10"
+    d="M 174.111875 289.996816 L 489.599747 289.996816 L 489.599747 303.960452 L 174.111875 303.960452 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s10"
+    d="M 174.111875 313.269543 L 424.390211 313.269543 L 424.390211 327.23318 L 174.111875 327.23318 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <path
+    class="s8"
+    d="M 174.111875 336.54227 L 399.623651 336.54227 L 399.623651 350.505907 L 174.111875 350.505907 z"
+    clip-path="url(#score-chart-p22ca3ff721)"
+  />
+
+  <text class="s11" x="632.810339" y="67.010736" transform="rotate(-0 632.810339 67.010736)">
+    83.17
+  </text>
+
+  <text class="s12" x="612.833795" y="90.283464" transform="rotate(-0 612.833795 90.283464)">
+    79.50
+  </text>
+
+  <text class="s11" x="603.743651" y="113.556191" transform="rotate(-0 603.743651 113.556191)">
+    77.83
+  </text>
+
+  <text class="s12" x="597.320675" y="136.828918" transform="rotate(-0 597.320675 136.828918)">
+    76.65
+  </text>
+
+  <text class="s12" x="594.925667" y="160.101645" transform="rotate(-0 594.925667 160.101645)">
+    76.21
+  </text>
+
+  <text class="s11" x="588.938147" y="183.374373" transform="rotate(-0 588.938147 183.374373)">
+    75.11
+  </text>
+
+  <text class="s11" x="588.176099" y="206.6471" transform="rotate(-0 588.176099 206.6471)">
+    74.97
+  </text>
+
+  <text class="s11" x="569.941379" y="229.919827" transform="rotate(-0 569.941379 229.919827)">
+    71.62
+  </text>
+
+  <text class="s12" x="566.729891" y="253.192555" transform="rotate(-0 566.729891 253.192555)">
+    71.03
+  </text>
+
+  <text class="s11" x="503.697635" y="276.465282" transform="rotate(-0 503.697635 276.465282)">
+    59.45
+  </text>
+
+  <text class="s11" x="495.587267" y="299.738009" transform="rotate(-0 495.587267 299.738009)">
+    57.96
+  </text>
+
+  <text class="s11" x="430.377731" y="323.010736" transform="rotate(-0 430.377731 323.010736)">
+    45.98
+  </text>
+
+  <text class="s11" x="405.611171" y="346.283464" transform="rotate(-0 405.611171 346.283464)">
+    41.43
+  </text>
+
+  <path class="s13" d="M 183.111875 16.738438 L 188.111875 16.738438 L 193.111875 16.738438" />
+
+  <text class="s14" x="201.111875" y="20.238438" transform="rotate(-0 201.111875 20.238438)">
+    WebMiner Model
+  </text>
+
+  <path class="s15" d="M 304.125938 16.738438 L 309.125938 16.738438 L 314.125938 16.738438" />
+
+  <text class="s14" x="322.125938" y="20.238438" transform="rotate(-0 322.125938 20.238438)">
+    API models
+  </text>
+
+  <path class="s16" d="M 397.472813 16.738438 L 402.472813 16.738438 L 407.472813 16.738438" />
+
+  <text class="s14" x="415.472813" y="20.238438" transform="rotate(-0 415.472813 20.238438)">
+    Qwen3.5 base
+  </text>
+
+  <defs>
+    <clippath id="score-chart-p22ca3ff721">
+      <rect x="174.111875" y="42.607725" width="544.32" height="322.56" />
+    </clippath>
+  </defs>
+</svg>

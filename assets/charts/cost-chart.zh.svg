@@ -1,0 +1,513 @@
+<svg
+  lang="zh-CN"
+  role="img"
+  aria-labelledby="cost-chart-title cost-chart-desc"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 731.325625 396.173603"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <title id="cost-chart-title">离线得分与每 100 条测试成本</title>
+  <desc id="cost-chart-desc">
+    横轴为美元成本，使用对数刻度；纵轴显示 40 至 90 分。每个点标注模型名。API
+    为记录费用，本地模型为生成阶段成本估算，不代表完整部署成本。
+  </desc>
+
+  <style>
+    * {
+      stroke-linejoin: round;
+      stroke-linecap: butt;
+    }
+    .s1 {
+      fill: #ffffff;
+    }
+    .s2 {
+      fill: none;
+      stroke: #e8ebee;
+      stroke-width: 0.7;
+      stroke-linecap: square;
+    }
+    .s3 {
+      fill: #59616b;
+      font: 10px "DejaVu Sans";
+      text-anchor: middle;
+    }
+    .s4 {
+      fill: #414852;
+      font: 10px "DejaVu Sans";
+      text-anchor: middle;
+    }
+    .s5 {
+      fill: #414852;
+      font: 10px "DejaVu Sans";
+      text-anchor: end;
+    }
+    .s6 {
+      fill: none;
+      stroke: #ccd0d5;
+      stroke-width: 0.8;
+      stroke-linejoin: miter;
+      stroke-linecap: square;
+    }
+    .s7 {
+      stroke: #ffffff;
+    }
+    .s8 {
+      fill: #939da8;
+      stroke: #ffffff;
+    }
+    .s9 {
+      fill: #2c659a;
+      stroke: #ffffff;
+    }
+    .s10 {
+      fill: #ba8756;
+      stroke: #ffffff;
+    }
+    .s11 {
+      fill: none;
+      stroke: #aab2bb;
+      stroke-width: 0.7;
+      stroke-linecap: round;
+    }
+    .s12 {
+      fill: #414852;
+      font: 9px "DejaVu Sans";
+      text-anchor: end;
+    }
+    .s13 {
+      fill: #2c659a;
+      font: 700 9px "DejaVu Sans";
+    }
+    .s14 {
+      fill: #414852;
+      font: 9px "DejaVu Sans";
+      text-anchor: start;
+    }
+    .s15 {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 1.5;
+      stroke-linecap: square;
+    }
+    .s16 {
+      font: 9px "DejaVu Sans";
+      text-anchor: start;
+    }
+    .s17 {
+      stroke: #ffffff;
+      stroke-linejoin: miter;
+    }
+    .s18 {
+      fill: #ba8756;
+      stroke: #ffffff;
+      stroke-linejoin: miter;
+    }
+  </style>
+  <path class="s1" d="M 0 396.173603 L 731.325625 396.173603 L 731.325625 0 L 0 0 z" />
+
+  <path
+    class="s1"
+    d="M 51.043125 348.177352 L 716.323125 348.177352 L 716.323125 52.689352 L 51.043125 52.689352 z"
+  />
+
+  <path
+    class="s2"
+    d="M 65.923453 348.177352 L 65.923453 52.689352"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s3" x="65.923453" y="363.77579" transform="rotate(-0 65.923453 363.77579)">
+    $0.05
+  </text>
+
+  <path
+    class="s2"
+    d="M 163.818359 348.177352 L 163.818359 52.689352"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s3" x="163.818359" y="363.77579" transform="rotate(-0 163.818359 363.77579)">
+    $0.10
+  </text>
+
+  <path
+    class="s2"
+    d="M 261.713264 348.177352 L 261.713264 52.689352"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s3" x="261.713264" y="363.77579" transform="rotate(-0 261.713264 363.77579)">
+    $0.20
+  </text>
+
+  <path
+    class="s2"
+    d="M 391.123289 348.177352 L 391.123289 52.689352"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s3" x="391.123289" y="363.77579" transform="rotate(-0 391.123289 363.77579)">
+    $0.50
+  </text>
+
+  <path
+    class="s2"
+    d="M 489.018194 348.177352 L 489.018194 52.689352"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s3" x="489.018194" y="363.77579" transform="rotate(-0 489.018194 363.77579)">
+    $1
+  </text>
+
+  <path
+    class="s2"
+    d="M 586.9131 348.177352 L 586.9131 52.689352"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s3" x="586.9131" y="363.77579" transform="rotate(-0 586.9131 363.77579)">$2</text>
+
+  <path
+    class="s2"
+    d="M 716.323125 348.177352 L 716.323125 52.689352"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s3" x="716.323125" y="363.77579" transform="rotate(-0 716.323125 363.77579)">
+    $5
+  </text>
+
+  <text class="s4" x="383.683125" y="385.453915" transform="rotate(-0 383.683125 385.453915)">
+    100 条样本成本（USD，对数刻度）
+  </text>
+
+  <path
+    class="s2"
+    d="M 51.043125 348.177353 L 716.323125 348.177353"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s5" x="43.043125" y="351.976571" transform="rotate(-0 43.043125 351.976571)">
+    40
+  </text>
+
+  <path
+    class="s2"
+    d="M 51.043125 289.079753 L 716.323125 289.079753"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s5" x="43.043125" y="292.878971" transform="rotate(-0 43.043125 292.878971)">
+    50
+  </text>
+
+  <path
+    class="s2"
+    d="M 51.043125 229.982153 L 716.323125 229.982153"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s5" x="43.043125" y="233.781371" transform="rotate(-0 43.043125 233.781371)">
+    60
+  </text>
+
+  <path
+    class="s2"
+    d="M 51.043125 170.884552 L 716.323125 170.884552"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s5" x="43.043125" y="174.683771" transform="rotate(-0 43.043125 174.683771)">
+    70
+  </text>
+
+  <path
+    class="s2"
+    d="M 51.043125 111.786952 L 716.323125 111.786952"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s5" x="43.043125" y="115.586171" transform="rotate(-0 43.043125 115.586171)">
+    80
+  </text>
+
+  <path
+    class="s2"
+    d="M 51.043125 52.689353 L 716.323125 52.689353"
+    clip-path="url(#cost-chart-p805e0188ab)"
+  />
+
+  <text class="s5" x="43.043125" y="56.488571" transform="rotate(-0 43.043125 56.488571)">90</text>
+
+  <text class="s4" x="16.238437" y="200.433352" transform="rotate(-90 16.238437 200.433352)">
+    离线得分 / 100
+  </text>
+
+  <path class="s6" d="M 51.043125 348.177353 L 51.043125 52.689353" />
+
+  <path class="s6" d="M 51.043125 348.177352 L 716.323125 348.177352" />
+
+  <defs>
+    <path
+      class="s7"
+      id="cost-chart-m6c97e66789"
+      d="M 0 3.278719 C 0.869527 3.278719 1.703557 2.933253 2.318405 2.318405 C 2.933253 1.703557 3.278719 0.869527 3.278719 0 C 3.278719 -0.869527 2.933253 -1.703557 2.318405 -2.318405 C 1.703557 -2.933253 0.869527 -3.278719 0 -3.278719 C -0.869527 -3.278719 -1.703557 -2.933253 -2.318405 -2.318405 C -2.933253 -1.703557 -3.278719 -0.869527 -3.278719 0 C -3.278719 0.869527 -2.933253 1.703557 -2.318405 2.318405 C -1.703557 2.933253 -0.869527 3.278719 0 3.278719 z"
+    />
+  </defs>
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="632.509174" y="93.053013" />
+  </g>
+
+  <defs>
+    <path
+      class="s7"
+      id="cost-chart-m83a7a23a72"
+      d="M 0 3.774917 C 1.00112 3.774917 1.961371 3.377168 2.66927 2.66927 C 3.377168 1.961371 3.774917 1.00112 3.774917 0 C 3.774917 -1.00112 3.377168 -1.961371 2.66927 -2.66927 C 1.961371 -3.377168 1.00112 -3.774917 0 -3.774917 C -1.00112 -3.774917 -1.961371 -3.377168 -2.66927 -2.66927 C -3.377168 -1.961371 -3.774917 -1.00112 -3.774917 0 C -3.774917 1.00112 -3.377168 1.961371 -2.66927 2.66927 C -1.961371 3.377168 -1.00112 3.774917 0 3.774917 z"
+    />
+  </defs>
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="134.926828" y="114.741832" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="648.443994" y="124.611132" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="115.049199" y="131.584648" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="106.412207" y="134.184943" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="307.048323" y="140.685679" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="554.405875" y="141.513045" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="399.884702" y="161.310741" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s9" xlink:href="#cost-chart-m83a7a23a72" x="108.725821" y="164.7975" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="143.9876" y="233.232521" />
+  </g>
+
+  <defs>
+    <path
+      class="s7"
+      id="cost-chart-md9d9376197"
+      d="M -0 4.636809 L 4.636809 0 L 0 -4.636809 L -4.636809 -0 z"
+    />
+  </defs>
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s10" xlink:href="#cost-chart-md9d9376197" x="178.047519" y="242.038063" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s10" xlink:href="#cost-chart-md9d9376197" x="122.433046" y="312.836988" />
+  </g>
+
+  <g clip-path="url(#cost-chart-p805e0188ab)">
+    <use class="s8" xlink:href="#cost-chart-m6c97e66789" x="191.78675" y="339.726396" />
+  </g>
+
+  <path class="s11" d="M 607.383731 82.800173 Q 617.16922 86.793299 626.954709 90.786425" />
+
+  <path
+    class="s1"
+    d="M 559.92933 81.66817 L 621.769174 81.66817 L 621.769174 70.437857 L 559.92933 70.437857 z"
+  />
+
+  <text class="s12" x="620.509174" y="78.536451" transform="rotate(-0 620.509174 78.536451)">
+    GPT-5.6 terra
+  </text>
+
+  <path class="s11" d="M 196.896105 97.212735 Q 168.799256 105.160422 140.702407 113.108109" />
+
+  <path
+    class="s1"
+    d="M 193.666828 96.396004 L 281.229796 96.396004 L 281.229796 75.087661 L 193.666828 75.087661 z"
+  />
+
+  <text class="s13" transform="translate(194.926828 83.186254)">WebMiner Model</text>
+  <text class="s13" transform="translate(194.926828 93.264286)">2B full</text>
+
+  <path class="s11" d="M 663.457293 130.843109 Q 658.71982 128.876598 653.982348 126.910086" />
+
+  <path
+    class="s1"
+    d="M 661.183994 143.226288 L 698.339932 143.226288 L 698.339932 131.995975 L 661.183994 131.995975 z"
+  />
+
+  <text class="s14" x="662.443994" y="140.094569" transform="rotate(-0 662.443994 140.094569)">
+    GPT-4.1
+  </text>
+
+  <path class="s11" d="M 162.796745 128.553747 Q 141.917393 129.879119 121.038042 131.204491" />
+
+  <path
+    class="s1"
+    d="M 165.789199 136.23882 L 253.352167 136.23882 L 253.352167 114.930477 L 165.789199 114.930477 z"
+  />
+
+  <text class="s13" transform="translate(167.049199 123.02907)">WebMiner Model</text>
+  <text class="s13" transform="translate(167.049199 133.107102)">2B LoRA</text>
+
+  <path class="s11" d="M 122.902886 97.573947 Q 115.890523 113.142112 108.878159 128.710276" />
+
+  <path
+    class="s1"
+    d="M 85.152207 94.839115 L 172.715176 94.839115 L 172.715176 73.530771 L 85.152207 73.530771 z"
+  />
+
+  <text class="s13" transform="translate(86.412207 81.629365)">WebMiner Model</text>
+  <text class="s13" transform="translate(86.412207 91.707396)">0.8B full</text>
+
+  <path class="s11" d="M 325.697277 135.154557 Q 319.247999 137.067358 312.79872 138.98016" />
+
+  <path
+    class="s1"
+    d="M 317.788323 134.300835 L 377.227698 134.300835 L 377.227698 123.070523 L 317.788323 123.070523 z"
+  />
+
+  <text class="s14" x="319.048323" y="131.169116" transform="rotate(-0 319.048323 131.169116)">
+    GPT-5.6 luna
+  </text>
+
+  <path class="s11" d="M 538.372366 154.967907 Q 544.090371 150.169521 549.808376 145.371135" />
+
+  <path
+    class="s1"
+    d="M 515.0965 168.128202 L 543.665875 168.128202 L 543.665875 156.897889 L 515.0965 156.897889 z"
+  />
+
+  <text class="s12" x="542.405875" y="164.996483" transform="rotate(-0 542.405875 164.996483)">
+    GPT-5
+  </text>
+
+  <path class="s11" d="M 422.403527 169.654427 Q 413.957593 166.525035 405.511659 163.395644" />
+
+  <path
+    class="s1"
+    d="M 410.624702 181.925898 L 470.11189 181.925898 L 470.11189 170.695585 L 410.624702 170.695585 z"
+  />
+
+  <text class="s14" x="411.884702" y="178.794179" transform="rotate(-0 411.884702 178.794179)">
+    GPT-4.1 mini
+  </text>
+
+  <path class="s11" d="M 132.313036 173.143782 Q 123.34834 169.971645 114.383643 166.799507" />
+
+  <path
+    class="s1"
+    d="M 121.465821 195.451672 L 209.02879 195.451672 L 209.02879 174.143328 L 121.465821 174.143328 z"
+  />
+
+  <text class="s13" transform="translate(122.725821 182.241922)">WebMiner Model</text>
+  <text class="s13" transform="translate(122.725821 192.319953)">0.8B LoRA</text>
+
+  <path class="s11" d="M 118.159316 224.781145 Q 128.22169 228.073694 138.284064 231.366244" />
+
+  <path
+    class="s1"
+    d="M 64.044475 223.847677 L 132.2476 223.847677 L 132.2476 212.617364 L 64.044475 212.617364 z"
+  />
+
+  <text class="s12" x="130.9876" y="220.715958" transform="rotate(-0 130.9876 220.715958)">
+    GPT-OSS-120B
+  </text>
+
+  <path class="s11" d="M 205.98354 247.815463 Q 194.953381 245.534335 183.923222 243.253207" />
+
+  <path
+    class="s1"
+    d="M 190.787519 259.653219 L 281.35705 259.653219 L 281.35705 248.422907 L 190.787519 248.422907 z"
+  />
+
+  <text class="s14" x="192.047519" y="256.5215" transform="rotate(-0 192.047519 256.5215)">
+    Qwen3.5-0.8B 基座
+  </text>
+
+  <path class="s11" d="M 132.190904 311.747363 Q 130.292219 311.959382 128.393535 312.171402" />
+
+  <path
+    class="s1"
+    d="M 135.173046 312.452144 L 217.156015 312.452144 L 217.156015 301.221831 L 135.173046 301.221831 z"
+  />
+
+  <text class="s14" x="136.433046" y="309.320425" transform="rotate(-0 136.433046 309.320425)">
+    Qwen3.5-2B 基座
+  </text>
+
+  <path class="s11" d="M 211.22672 334.167217 Q 204.389982 336.122294 197.553245 338.077372" />
+
+  <path
+    class="s1"
+    d="M 202.52675 333.341552 L 264.972687 333.341552 L 264.972687 322.111239 L 202.52675 322.111239 z"
+  />
+
+  <text class="s14" x="203.78675" y="330.209833" transform="rotate(-0 203.78675 330.209833)">
+    GPT-4.1 nano
+  </text>
+
+  <path class="s15" d="M 59.143125 15.928594 L 68.143125 15.928594 L 77.143125 15.928594" />
+  <defs>
+    <path
+      class="s7"
+      id="cost-chart-mbf254b9fd1"
+      d="M 0 3.5 C 0.928211 3.5 1.81853 3.131218 2.474874 2.474874 C 3.131218 1.81853 3.5 0.928211 3.5 0 C 3.5 -0.928211 3.131218 -1.81853 2.474874 -2.474874 C 1.81853 -3.131218 0.928211 -3.5 0 -3.5 C -0.928211 -3.5 -1.81853 -3.131218 -2.474874 -2.474874 C -3.131218 -1.81853 -3.5 -0.928211 -3.5 0 C -3.5 0.928211 -3.131218 1.81853 -2.474874 2.474874 C -1.81853 3.131218 -0.928211 3.5 0 3.5 z"
+    />
+  </defs>
+
+  <use class="s9" xlink:href="#cost-chart-mbf254b9fd1" x="68.143125" y="15.928594" />
+
+  <text class="s16" x="80.743125" y="19.078594" transform="rotate(-0 80.743125 19.078594)">
+    WebMiner Model · 估算
+  </text>
+
+  <path class="s15" d="M 221.953125 15.928594 L 230.953125 15.928594 L 239.953125 15.928594" />
+  <defs>
+    <path
+      class="s7"
+      id="cost-chart-m3fe328216a"
+      d="M 0 3.5 C 0.928211 3.5 1.81853 3.131218 2.474874 2.474874 C 3.131218 1.81853 3.5 0.928211 3.5 0 C 3.5 -0.928211 3.131218 -1.81853 2.474874 -2.474874 C 1.81853 -3.131218 0.928211 -3.5 0 -3.5 C -0.928211 -3.5 -1.81853 -3.131218 -2.474874 -2.474874 C -3.131218 -1.81853 -3.5 -0.928211 -3.5 0 C -3.5 0.928211 -3.131218 1.81853 -2.474874 2.474874 C -1.81853 3.131218 -0.928211 3.5 0 3.5 z"
+    />
+  </defs>
+
+  <use class="s8" xlink:href="#cost-chart-m3fe328216a" x="230.953125" y="15.928594" />
+
+  <text class="s16" x="243.553125" y="19.078594" transform="rotate(-0 243.553125 19.078594)">
+    API · 记录费用
+  </text>
+
+  <path class="s15" d="M 318.970312 15.928594 L 327.970312 15.928594 L 336.970312 15.928594" />
+  <defs>
+    <path
+      class="s17"
+      id="cost-chart-mc76076fab3"
+      d="M -0 4.949747 L 4.949747 0 L 0 -4.949747 L -4.949747 -0 z"
+    />
+  </defs>
+
+  <use class="s18" xlink:href="#cost-chart-mc76076fab3" x="327.970312" y="15.928594" />
+
+  <text class="s16" x="340.570312" y="19.078594" transform="rotate(-0 340.570312 19.078594)">
+    Qwen3.5 基座 · 估算
+  </text>
+
+  <defs>
+    <clippath id="cost-chart-p805e0188ab">
+      <rect x="51.043125" y="52.689352" width="665.28" height="295.488" />
+    </clippath>
+  </defs>
+</svg>
