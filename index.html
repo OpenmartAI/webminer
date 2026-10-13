@@ -1,0 +1,4343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="description"
+      content="WebMiner technical report: from HTML and Markdown to structured business data, and from direct SFT to stepwise supervision and five-task mixed SFT. Includes WebMiner Model training methods and an offline evaluation on 100 examples."
+      data-i18n-content="0"
+    />
+    <title data-i18n-text="1">
+      WebMiner: Post-training Our Own Models for High-quality, Low-cost Business
+      Website Extraction
+    </title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #24292f;
+        --muted: #636c76;
+        --line: #dce1e5;
+        --blue: #2c659a;
+        --paper: #fff;
+        --soft: #f7f8fa;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 24px;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC",
+          "Microsoft YaHei", sans-serif;
+        font-size: 16px;
+        line-height: 1.95;
+      }
+      a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      a:focus-visible,
+      [tabindex]:focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 4px;
+      }
+      .report {
+        max-width: 980px;
+        margin: auto;
+        padding: 0 36px;
+      }
+      .prose {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .masthead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 20px 0 15px;
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.03em;
+      }
+      .masthead a {
+        color: var(--ink);
+        font-weight: 650;
+      }
+      /* Language controls share the report's simple typography. */
+      .masthead-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px 18px;
+      }
+      .language-switch {
+        display: inline-flex;
+        flex-shrink: 0;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .language-switch button {
+        appearance: none;
+        border: 0;
+        border-radius: 0;
+        background: white;
+        color: var(--muted);
+        font: inherit;
+        font-size: 12px;
+        line-height: 1;
+        padding: 9px 11px;
+        min-height: 32px;
+        cursor: pointer;
+      }
+      .language-switch button + button {
+        border-left: 1px solid var(--line);
+      }
+      .language-switch button[aria-pressed="true"] {
+        background: var(--blue);
+        color: white;
+        font-weight: 650;
+      }
+      .language-switch button:focus-visible {
+        outline: 2px solid var(--ink);
+        outline-offset: -3px;
+      }
+      html:lang(en) .abstract p {
+        text-align: left;
+      }
+
+      .title-block {
+        text-align: center;
+        padding: 57px 0 27px;
+      }
+      h1 {
+        font-size: 38px;
+        line-height: 1.4;
+        letter-spacing: -0.025em;
+        margin: 0;
+        font-weight: 680;
+      }
+      h1 span {
+        display: block;
+        font-size: 25px;
+        font-weight: 500;
+        margin-top: 8px;
+      }
+      .subtitle {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 16px 0 10px;
+      }
+      .resource-links {
+        display: flex;
+        justify-content: center;
+        gap: 22px;
+        flex-wrap: wrap;
+        font-size: 14px;
+      }
+      .abstract {
+        padding: 23px 0 27px;
+        border-bottom: 1px solid var(--line);
+      }
+      .abstract h2 {
+        font-size: 17px;
+        margin: 0 0 10px;
+        text-align: center;
+      }
+      .abstract p {
+        margin: 0;
+        text-align: justify;
+      }
+      .contents {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px 25px;
+        padding: 19px 0;
+        font-size: 13px;
+        border-bottom: 1px solid var(--line);
+      }
+      .contents a {
+        color: var(--muted);
+      }
+      section {
+        padding-top: 40px;
+      }
+      h2 {
+        font-size: 25px;
+        line-height: 1.5;
+        font-weight: 650;
+        letter-spacing: -0.015em;
+        margin: 0 0 18px;
+      }
+      h2 .section-number {
+        margin-right: 12px;
+        color: #6c747e;
+        font-weight: 450;
+      }
+      h3 {
+        font-size: 18px;
+        font-weight: 650;
+        margin: 27px 0 10px;
+        line-height: 1.6;
+      }
+      p {
+        margin: 12px 0 16px;
+      }
+      strong {
+        font-weight: 650;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.87em;
+        background: #f3f5f7;
+        padding: 2px 4px;
+        border-radius: 2px;
+        overflow-wrap: anywhere;
+      }
+      .figure {
+        margin: 27px 0 29px;
+      }
+      .figure-scroll {
+        overflow-x: auto;
+        padding: 5px 0;
+      }
+      .figure svg * {
+        stroke-linejoin: round;
+        stroke-linecap: butt;
+      }
+      .figure svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        min-width: 680px;
+      }
+      .figure figcaption {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.8;
+        margin: 13px auto 0;
+        max-width: 800px;
+      }
+      .figure figcaption strong {
+        color: var(--ink);
+      }
+      .chart-figure {
+        border-top: 1px solid var(--line);
+        padding-top: 22px;
+      }
+      .figure-heading {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .pipeline {
+        display: grid;
+        grid-template-columns: 1fr 24px 1fr 24px 1.2fr;
+        align-items: center;
+        gap: 10px;
+        padding: 27px 23px;
+        background: var(--soft);
+        border: 1px solid var(--line);
+      }
+      .pipeline .step {
+        border: 1px solid #cfd5db;
+        background: #fff;
+        padding: 14px 12px;
+        text-align: center;
+      }
+      .step strong {
+        display: block;
+        font-size: 17px;
+        font-weight: 600;
+      }
+      .step span {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 5px;
+      }
+      .arrow {
+        text-align: center;
+        color: #7a8590;
+      }
+      .context-note {
+        font-size: 12px;
+        color: var(--muted);
+        text-align: center;
+        margin: 0 0 10px;
+      }
+      .method-diagram {
+        border: 1px solid var(--line);
+        padding: 21px 25px;
+        background: #fcfcfd;
+      }
+      .method-row {
+        display: grid;
+        grid-template-columns: 105px 1fr 22px 1.3fr;
+        gap: 13px;
+        align-items: center;
+        padding: 14px 0;
+      }
+      .method-row + .method-row {
+        border-top: 1px solid var(--line);
+      }
+      .method-label {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .method-box {
+        padding: 11px 13px;
+        border: 1px solid #ccd3da;
+        background: #fff;
+        font-size: 13px;
+        text-align: center;
+        line-height: 1.65;
+      }
+      .method-box small {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .task-branches {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+      }
+      .task-branches span {
+        border: 1px solid #ccd3da;
+        padding: 9px 3px;
+        background: white;
+        font-size: 12px;
+        text-align: center;
+      }
+      .branch-context {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0 0 7px;
+      }
+      .mix-note {
+        text-align: center;
+        font-size: 12px;
+        border-top: 1px dashed #ccd3da;
+        padding-top: 16px;
+        margin-top: 12px;
+        color: var(--blue);
+      }
+      .equation {
+        padding: 17px 15px;
+        margin: 22px 0;
+        text-align: center;
+        background: var(--soft);
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 18px;
+        line-height: 1.8;
+        overflow-x: auto;
+      }
+      .equation .eq-note {
+        display: block;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .table-scroll {
+        overflow-x: auto;
+        margin: 20px 0 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+      caption {
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 11px;
+      }
+      th,
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e5e8eb;
+        text-align: left;
+        vertical-align: top;
+      }
+      thead {
+        border-top: 2px solid #636c76;
+        border-bottom: 1px solid #9ca5ad;
+      }
+      thead th {
+        font-weight: 600;
+        color: #454e58;
+        background: #fafbfc;
+      }
+      tbody th {
+        font-weight: 450;
+      }
+      .num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      #ranking {
+        white-space: nowrap;
+      }
+      #ranking td,
+      #ranking th {
+        vertical-align: middle;
+      }
+      #ranking small {
+        display: block;
+        font-size: 10px;
+        color: var(--muted);
+      }
+      .ours {
+        background: #f1f6fa;
+      }
+      .ours th,
+      .ours .num:first-of-type {
+        font-weight: 650;
+        color: var(--blue);
+      }
+      .table-note {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.85;
+      }
+      .task-table {
+        min-width: 680px;
+      }
+      .data-table {
+        min-width: 700px;
+      }
+      .config-table th {
+        width: 29%;
+        font-weight: 500;
+      }
+      .config-table td {
+        color: #454e58;
+      }
+      .findings {
+        padding-left: 22px;
+      }
+      .findings li {
+        padding-left: 3px;
+        margin: 9px 0;
+      }
+      .footer {
+        margin-top: 44px;
+        padding: 20px 0 35px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .skip {
+        position: fixed;
+        top: -70px;
+        left: 20px;
+        background: #fff;
+        z-index: 20;
+        padding: 10px;
+        border: 1px solid var(--line);
+      }
+      .skip:focus {
+        top: 10px;
+      }
+      @media (max-width: 650px) {
+        body {
+          font-size: 15px;
+          line-height: 1.9;
+        }
+        .report {
+          padding: 0 19px;
+        }
+        .masthead {
+          align-items: flex-start;
+          font-size: 10px;
+        }
+        .masthead-right {
+          gap: 7px 12px;
+        }
+        .language-switch button {
+          padding: 9px 10px;
+        }
+        .title-block {
+          padding: 38px 0 22px;
+        }
+        h1 {
+          font-size: 32px;
+        }
+        h1 span {
+          font-size: 21px;
+        }
+        .subtitle {
+          font-size: 12px;
+        }
+        .resource-links {
+          gap: 10px 18px;
+          font-size: 13px;
+        }
+        .abstract {
+          padding-top: 14px;
+        }
+        .abstract p {
+          text-align: left;
+        }
+        .contents {
+          gap: 7px 17px;
+          font-size: 12px;
+        }
+        section {
+          padding-top: 32px;
+        }
+        h2 {
+          font-size: 23px;
+        }
+        h3 {
+          font-size: 17px;
+        }
+        .pipeline {
+          grid-template-columns: 1fr;
+          padding: 20px;
+          gap: 7px;
+        }
+        .pipeline .arrow {
+          transform: rotate(90deg);
+        }
+        .pipeline .step {
+          padding: 10px;
+        }
+        .figure {
+          margin: 23px 0;
+        }
+        .method-diagram {
+          padding: 14px;
+        }
+        .method-row {
+          grid-template-columns: 1fr;
+          gap: 9px;
+        }
+        .method-label {
+          font-size: 12px;
+        }
+        .method-row > .arrow {
+          transform: rotate(90deg);
+        }
+        .task-branches {
+          gap: 5px;
+        }
+        .mix-note {
+          text-align: left;
+        }
+        .equation {
+          font-size: 16px;
+        }
+        .config-table {
+          min-width: 540px;
+        }
+        .footer {
+          font-size: 10px;
+        }
+        .figure-heading {
+          font-size: 14px;
+        }
+        .figure-scroll:after {
+          content: attr(data-scroll-hint);
+          display: block;
+          color: var(--muted);
+          font-size: 11px;
+          padding-top: 8px;
+        }
+        th,
+        td {
+          padding: 9px 10px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+      @media print {
+        .report {
+          max-width: none;
+          padding: 0;
+        }
+        .contents,
+        .resource-links,
+        .language-switch,
+        .skip {
+          display: none;
+        }
+        section {
+          padding-top: 20px;
+        }
+        .figure,
+        table {
+          break-inside: avoid;
+        }
+        .figure svg {
+          min-width: 0;
+        }
+        a {
+          color: inherit;
+        }
+        .table-scroll,
+        .figure-scroll {
+          overflow: visible;
+        }
+        body {
+          font-size: 11pt;
+        }
+        .title-block {
+          padding-top: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main"
+      ><!--i18n:2-->
+      Skip to content
+    </a>
+    <div class="report">
+      <header class="masthead">
+        <a href="#top">WebMiner</a>
+        <div class="masthead-right">
+          <span
+            ><!--i18n:3-->
+            Technical report · October 2026
+          </span>
+          <div
+            class="language-switch"
+            role="group"
+            aria-label="Language / 语言"
+          >
+            <button
+              type="button"
+              data-language="en"
+              lang="en"
+              aria-label="Read in English"
+              aria-pressed="true"
+            >
+              EN</button
+            ><button
+              type="button"
+              data-language="zh"
+              lang="zh-CN"
+              aria-label="切换为中文"
+              aria-pressed="false"
+            >
+              ZH
+            </button>
+          </div>
+        </div>
+      </header>
+      <main id="main">
+        <header class="title-block" id="top">
+          <h1>
+            WebMiner<span
+              ><!--i18n:4-->
+              Building our own models through post-training <br /><!--i18n:5-->
+              High-quality, low-cost extraction from business websites
+            </span>
+          </h1>
+          <p class="subtitle">
+            <!--i18n:6-->
+            From direct supervised fine-tuning to stepwise supervision and
+            five-task mixed training
+          </p>
+          <div class="resource-links">
+            <a href="#method"
+              ><!--i18n:7-->
+              Training methods </a
+            ><a href="#results"
+              ><!--i18n:8-->
+              Evaluation results
+            </a>
+          </div>
+        </header>
+        <div class="abstract prose">
+          <h2>
+            <!--i18n:9-->
+            Abstract
+          </h2>
+          <p>
+            <!--i18n:10-->
+            WebMiner post-trains small, open-weight language models for
+            high-quality, low-cost structured data extraction from business
+            websites. An upstream task converts the HTML of websites listed by
+            businesses on Google Maps into Markdown. Given the website URL and
+            complete Markdown, the model extracts business identity, contact
+            details, descriptions, and staff information. Our training approach
+            evolved from supervised fine-tuning (SFT) on final structured
+            answers to five-task mixed SFT that combines intermediate tasks,
+            such as business identification, with the final extraction task. On
+            the test set, the fully fine-tuned 2B WebMiner Model exceeds GPT-5.6
+            luna in extraction quality and approaches GPT-5.6 terra, with
+            estimated local generation costs of approximately
+            <strong>1/33</strong
+            ><!--i18n:160-->
+            of GPT-5.6 terra's API charges.
+          </p>
+        </div>
+        <nav
+          class="contents"
+          aria-label="Report contents"
+          data-i18n-aria-label="11"
+        >
+          <a href="#background"
+            ><!--i18n:12-->
+            1. Background </a
+          ><a href="#method"
+            ><!--i18n:13-->
+            2. Methods </a
+          ><a href="#data"
+            ><!--i18n:14-->
+            3. Experimental setup </a
+          ><a href="#results"
+            ><!--i18n:15-->
+            4. Results
+          </a>
+        </nav>
+        <section id="background">
+          <div class="prose">
+            <h2>
+              <span class="section-number">1</span
+              ><!--i18n:16-->
+              Background and task definition
+            </h2>
+            <p>
+              <!--i18n:17-->
+              The upstream system scans geographic regions on Google Maps, saves
+              business listings, and visits their registered website URLs to
+              retrieve HTML and convert it into Markdown. WebMiner processes
+              this saved text to turn scattered business information into a
+              consistent structured object. The target Google Maps listing
+              anchors decisions about which business the information belongs to;
+              the website URL and Markdown provide the evidence available to the
+              model.
+            </p>
+          </div>
+          <figure class="figure prose">
+            <p class="context-note">
+              <!--i18n:18-->
+              Collection starts with a Google Maps business listing and its
+              registered website URL
+            </p>
+            <div
+              class="pipeline"
+              role="img"
+              aria-label="The upstream system converts HTML into Markdown. WebMiner extracts structured business data from the URL and Markdown."
+              data-i18n-aria-label="19"
+            >
+              <div class="step">
+                <strong>HTML</strong
+                ><span
+                  ><!--i18n:20-->
+                  Pages from the business's registered website
+                </span>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <strong>Markdown</strong
+                ><span
+                  ><!--i18n:21-->
+                  Converted and saved page text
+                </span>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <strong
+                  ><!--i18n:22-->
+                  Structured data </strong
+                ><span
+                  ><!--i18n:23-->
+                  Identity · Contacts · Description · Staff
+                </span>
+              </div>
+            </div>
+            <figcaption>
+              <strong
+                ><!--i18n:24-->
+                Figure 1. Data processing pipeline. </strong
+              ><!--i18n:25-->
+              The upstream system handles HTML-to-Markdown conversion. WebMiner
+              takes the URL and saved Markdown as input and returns a result
+              that conforms to the task schema.
+            </figcaption>
+          </figure>
+          <div class="prose">
+            <p>
+              <!--i18n:26-->
+              Before extracting business information, the model must determine
+              whether the page still provides valid information about the target
+              business, then establish which content belongs to it. For example,
+              an abandoned business website may be replaced by a domain-for-sale
+              page. In that case, the business information should be treated as
+              unavailable, rather than extracting the domain provider's details
+              as if they belonged to the business. On a third-party platform, a
+              business profile may appear alongside platform support details and
+              customer reviews. The model must focus on the target business:
+              platform support phone numbers and email addresses must not be
+              attributed to the business, and customer names in reviews must not
+              be mistaken for employee names. A field's presence on the page is
+              only the starting point; evidence that it belongs to the target
+              business determines whether it should be extracted.
+            </p>
+            <p>
+              <!--i18n:27-->
+              In addition to resolving attribution, the model must handle noise
+              introduced during HTML-to-Markdown conversion, including excess
+              whitespace, escape characters, encoding errors, and joined text.
+              Training and evaluation use saved, fixed page text. Extraction
+              must be grounded in that text, without inventing missing
+              information or business relationships. When a page provides valid
+              information about the target business, the model organizes it into
+              a schema-compliant <code>info</code
+              ><!--i18n:28-->
+              object; when the page is unsuitable for business information
+              extraction, it returns <code>{"info": null}</code
+              ><!--i18n:159-->.
+            </p>
+          </div>
+        </section>
+        <section id="method">
+          <div class="prose">
+            <h2>
+              <span class="section-number">2</span
+              ><!--i18n:29-->
+              From SFT to stepwise SFT
+            </h2>
+            <h3>
+              <!--i18n:30-->
+              2.1 Learning the final structured output directly
+            </h3>
+            <p>
+              <!--i18n:31-->
+              Early SFT paired webpage inputs with final teacher-generated
+              objects. Given the task instructions, URL, and Markdown, the model
+              learned to generate the complete structured answer. Training used
+              the standard autoregressive objective: predicting the next target
+              token conditioned on the input and preceding target tokens. The
+              examples included both valid and invalid pages, teaching the model
+              to extract business information in the required format and to
+              return a null result when a page was unsuitable.
+            </p>
+            <div
+              class="equation"
+              aria-label="The supervised fine-tuning loss is the mean negative log probability of the target output tokens."
+              data-i18n-aria-label="32"
+            >
+              ℒ<sub>SFT</sub> = − (1 / |y|) ∑<sub>t</sub> log
+              p<sub>θ</sub>(y<sub>t</sub> | x, y<sub>&lt;t</sub>)<span
+                class="eq-note"
+                ><!--i18n:33-->
+                x: instructions and webpage input; y: target output. Loss is
+                computed only on the target output.
+              </span>
+            </div>
+            <p>
+              <!--i18n:34-->
+              Direct SFT provides the final structured answer but does not
+              explicitly expose the dependency between identifying the business
+              and extracting information about that business. A central
+              difficulty in early training was that the model struggled to learn
+              this dependency reliably from input–answer pairs alone. It could
+              fill fields with information found on the page without checking
+              whether that information belonged to the target business. We
+              therefore moved to stepwise SFT, making business identification,
+              contact attribution, description summarization, and staff
+              selection explicit. Each decision becomes a verifiable training
+              objective with its own inputs, labels, and validation rules.
+            </p>
+            <p>
+              <!--i18n:35-->
+              These intermediate tasks provide more granular learning signals,
+              allowing the model to learn business identification and extraction
+              conditioned on that identity. We train them as auxiliary
+              objectives alongside the end-to-end (E2E) task of generating the
+              final result. The aim is to support learning the complete
+              extraction task by teaching the capabilities required at each
+              step.
+            </p>
+            <h3>
+              <!--i18n:36-->
+              2.2 Decomposing extraction into independent supervised tasks
+            </h3>
+            <p>
+              <!--i18n:37-->
+              We first construct four supervised tasks: business identification,
+              contact extraction, staff extraction, and business description.
+              Adding a task that directly generates the final structured result
+              yields five-task mixed SFT. Contact extraction, staff extraction,
+              and business description each receive the confirmed business
+              identity as context and learn their own targets independently,
+              without relying on one another's outputs. The combined task
+              receives only the URL and complete Markdown, with no intermediate
+              answers, so the model also learns end-to-end extraction.
+            </p>
+          </div>
+          <figure class="figure prose">
+            <div class="method-diagram">
+              <div class="method-row">
+                <div class="method-label">
+                  <!--i18n:38-->
+                  Identity supervision
+                </div>
+                <div class="method-box">URL + Markdown</div>
+                <div class="arrow" aria-hidden="true">→</div>
+                <div class="method-box">
+                  <!--i18n:39-->
+                  Business identification target
+                  <small
+                    ><!--i18n:40-->
+                    Identity, service status, and content characteristics
+                  </small>
+                </div>
+              </div>
+              <div class="method-row">
+                <div class="method-label">
+                  <!--i18n:41-->
+                  Three independent tasks
+                </div>
+                <div class="method-box">
+                  <!--i18n:42-->
+                  Source material + confirmed identity
+                </div>
+                <div class="arrow" aria-hidden="true">→</div>
+                <div>
+                  <p class="branch-context">
+                    <!--i18n:43-->
+                    Separate training conversations; no shared outputs
+                  </p>
+                  <div class="task-branches">
+                    <span
+                      ><!--i18n:44-->
+                      Contact details </span
+                    ><span
+                      ><!--i18n:45-->
+                      Business description </span
+                    ><span
+                      ><!--i18n:46-->
+                      Staff information
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="method-row">
+                <div class="method-label">
+                  <!--i18n:47-->
+                  Combined supervision
+                </div>
+                <div class="method-box">
+                  URL + Markdown<small
+                    ><!--i18n:48-->
+                    No intermediate teacher answers
+                  </small>
+                </div>
+                <div class="arrow" aria-hidden="true">→</div>
+                <div class="method-box">
+                  <!--i18n:49-->
+                  Final info object / null
+                </div>
+              </div>
+              <div class="mix-note">
+                <!--i18n:50-->
+                Five types of records → global shuffle → mixed SFT of one model.
+                Evaluation of the combined task generates the final result in a
+                single request.
+              </div>
+            </div>
+            <figcaption>
+              <strong
+                ><!--i18n:51-->
+                Figure 2. Stepwise and combined supervision. </strong
+              ><!--i18n:52-->
+              Stepwise supervision decomposes the training targets. All task
+              records are mixed within the same epoch; preceding identity
+              answers supplied as context do not contribute additional loss.
+            </figcaption>
+          </figure>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="Inputs and training targets for the five tasks"
+            data-i18n-aria-label="53"
+          >
+            <table class="task-table">
+              <caption>
+                <!--i18n:54-->
+                Inputs and targets for five-task supervision
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <!--i18n:55-->
+                    Task
+                  </th>
+                  <th scope="col">
+                    <!--i18n:56-->
+                    Input
+                  </th>
+                  <th scope="col">
+                    <!--i18n:57-->
+                    Supervision target
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">
+                    <!--i18n:58-->
+                    Business identification
+                  </th>
+                  <td>
+                    <!--i18n:59-->
+                    URL and complete Markdown
+                  </td>
+                  <td>
+                    <!--i18n:60-->
+                    Six identity fields
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <!--i18n:44-->
+                    Contact details
+                  </th>
+                  <td>
+                    <!--i18n:61-->
+                    Source material, confirmed identity, and contact candidates
+                  </td>
+                  <td>
+                    <!--i18n:62-->
+                    Accepted emails and phone numbers
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <!--i18n:45-->
+                    Business description
+                  </th>
+                  <td>
+                    <!--i18n:63-->
+                    Source material and confirmed identity
+                  </td>
+                  <td>
+                    <!--i18n:64-->
+                    Six description fields
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <!--i18n:65-->
+                    Staff extraction
+                  </th>
+                  <td>
+                    <!--i18n:63-->
+                    Source material and confirmed identity
+                  </td>
+                  <td>
+                    <!--i18n:66-->
+                    Names and roles, up to 20 people
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <!--i18n:67-->
+                    Combined output
+                  </th>
+                  <td>
+                    <!--i18n:59-->
+                    URL and complete Markdown
+                  </td>
+                  <td>
+                    <code
+                      ><!--i18n:68-->
+                      {"info": object or null}
+                    </code>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="prose">
+            <h3>
+              <!--i18n:69-->
+              2.3 Mixed training and checkpoint selection
+            </h3>
+            <p>
+              <!--i18n:70-->
+              A single business webpage can produce training examples for
+              several tasks. We shuffle examples from all tasks together and use
+              each example once per epoch. Loss is computed only on the current
+              task's target answer; identity information supplied as input
+              context does not contribute additional loss. For business examples
+              judged invalid or otherwise unsuitable for further extraction, we
+              retain only the identity task and the null-output target (<code
+                >info=null</code
+              ><!--i18n:71-->), without constructing contact, staff, or
+              description extraction tasks.
+            </p>
+            <p>
+              <!--i18n:72-->
+              To emphasize the final extraction result, we assign a loss weight
+              of 0.5 to the combined task and 0.125 to each of the four
+              intermediate tasks. Each task's loss is first normalized by its
+              target token count so that longer answers do not dominate
+              training. At each optimization step, weights are then renormalized
+              across the tasks present in that step.
+            </p>
+            <p>
+              <!--i18n:73-->
+              During training, we track validation loss for all five tasks and
+              select the checkpoint with the lowest combined-task validation
+              loss for final evaluation. All four models use the same training
+              workflow and data, each starting independently from a pinned
+              version of the original Qwen3.5 base model. This compares full
+              fine-tuning with LoRA at both 0.8B and 2B scales.
+            </p>
+          </div>
+        </section>
+        <section id="data">
+          <div class="prose">
+            <h2>
+              <span class="section-number">3</span
+              ><!--i18n:74-->
+              Data and experimental setup
+            </h2>
+            <h3>
+              <!--i18n:75-->
+              3.1 Data selection and freezing
+            </h3>
+            <p>
+              <!--i18n:76-->
+              The training data must cover standard business extraction as well
+              as different languages, inactive websites, and unusual page
+              content. We therefore retain 705 multilingual or non-English
+              examples and 1,285 examples flagged for abnormal website service
+              status or page content. The groups overlap by 118 examples, giving
+              1,872 distinct examples. We then sample 1,000 additional examples
+              without replacement from the remaining businesses whose service
+              status and page content are both normal, using a fixed random seed
+              of 42 for reproducibility.
+            </p>
+            <p>
+              <!--i18n:77-->
+              After excluding training examples that exceed the length limit or
+              duplicate test data, the dataset contains 2,869 business examples,
+              expanded into 13,718 applicable task records. All 705 multilingual
+              or non-English examples and the 1,000 additionally sampled normal
+              examples are retained. Every task record derived from the same
+              business example stays in the same split, rather than being
+              distributed across training, validation, and test sets.
+            </p>
+            <p>
+              <!--i18n:78-->
+              Before training, we fix the webpage inputs, supervision labels,
+              and data splits, and record the example lists and exclusion
+              reasons. This is the data-freezing process. All four models use
+              the same frozen data to keep the data conditions consistent. Page
+              text is not truncated; records exceeding the length limit or
+              unsuitable for a task are excluded, with reasons retained for
+              review.
+            </p>
+          </div>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="Training and validation dataset sizes"
+            data-i18n-aria-label="79"
+          >
+            <table class="data-table">
+              <caption>
+                <!--i18n:80-->
+                WebMiner Model training and validation data: business examples
+                and task records
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <!--i18n:81-->
+                    Split
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:82-->
+                    Businesses
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:83-->
+                    Identity
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:84-->
+                    Contacts
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:85-->
+                    Description
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:86-->
+                    Staff
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:87-->
+                    Combined
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:88-->
+                    Total records
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">
+                    <!--i18n:89-->
+                    Training
+                  </th>
+                  <td class="num">2,869</td>
+                  <td class="num">2,869</td>
+                  <td class="num">2,658</td>
+                  <td class="num">2,667</td>
+                  <td class="num">2,657</td>
+                  <td class="num">2,867</td>
+                  <td class="num">13,718</td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <!--i18n:90-->
+                    Validation
+                  </th>
+                  <td class="num">158</td>
+                  <td class="num">158</td>
+                  <td class="num">153</td>
+                  <td class="num">153</td>
+                  <td class="num">153</td>
+                  <td class="num">158</td>
+                  <td class="num">775</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note prose">
+            <!--i18n:91-->
+            The test set contains 100 examples. All reported scores, failure
+            counts, and total costs refer to this test set.
+          </p>
+          <div class="prose">
+            <h3>
+              <!--i18n:92-->
+              3.2 Models and optimization settings
+            </h3>
+            <p>
+              <!--i18n:93-->
+              We evaluate Qwen3.5-0.8B and Qwen3.5-2B, using both full
+              language-model fine-tuning and LoRA at each scale. Full
+              fine-tuning leaves the vision module unchanged. LoRA retains a
+              separate adapter, while the merged model is used for this
+              evaluation.
+            </p>
+            <div
+              class="table-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="Training configuration"
+              data-i18n-aria-label="94"
+            >
+              <table class="config-table">
+                <caption>
+                  <!--i18n:95-->
+                  Shared settings and differences across the four models
+                </caption>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      <!--i18n:96-->
+                      Epochs and batch size
+                    </th>
+                    <td>
+                      <!--i18n:97-->
+                      1 epoch; microbatch=1; gradient accumulation=16
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <!--i18n:98-->
+                      Full fine-tuning learning rate
+                    </th>
+                    <td>2 × 10<sup>−5</sup></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <!--i18n:99-->
+                      LoRA settings
+                    </th>
+                    <td>
+                      <!--i18n:100-->
+                      Learning rate: 1 × 10 <sup>−4</sup
+                      ><!--i18n:161-->; rank=16; alpha=32; dropout=0
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <!--i18n:101-->
+                      Numerical precision
+                    </th>
+                    <td>
+                      <!--i18n:102-->
+                      BF16 computation; FP32 trainable parameters
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <!--i18n:103-->
+                      Sampling and schedule
+                    </th>
+                    <td>
+                      <!--i18n:104-->
+                      seed=42; global shuffle; cosine; warmup=5%; weight
+                      decay=0.01
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <!--i18n:105-->
+                      Maximum sequence length
+                    </th>
+                    <td>
+                      <!--i18n:106-->
+                      131,072 tokens; no truncation
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <!--i18n:107-->
+                      Checkpoint selection
+                    </th>
+                    <td>
+                      <!--i18n:108-->
+                      Lowest combined-task validation loss
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>
+              <!--i18n:109-->
+              3.3 Evaluation and cost accounting
+            </h3>
+            <p>
+              <!--i18n:110-->
+              All models use the same test set. Each request provides only the
+              website URL and complete Markdown, and the model generates the
+              final structured result in one pass without intermediate answers.
+              Results are compared with fixed reference answers using a common
+              scoring procedure, yielding a score out of 100. Failed requests,
+              generation failures, and outputs that fail format validation
+              receive zero points.
+            </p>
+            <p>
+              <!--i18n:111-->
+              Reasoning is disabled wherever possible. Models that cannot
+              disable it use their lowest supported setting: minimal for GPT-5
+              and low for GPT-OSS-120B. The GPT-4.1 family does not support this
+              feature. The actual settings are listed in the results table.
+            </p>
+            <p>
+              <!--i18n:112-->
+              Locally run WebMiner Model and Qwen base models use batches of 20
+              examples. API models and Qwen base models have a maximum output
+              length of 8,192 tokens; WebMiner Model uses 4,096 tokens.
+            </p>
+            <p>
+              <!--i18n:113-->
+              Costs cover the entire test set. API costs are the recorded
+              charges for all requests. For local models, we sum the measured
+              generation time across batches and convert it using a server price
+              of $1.99 per hour for a machine with one A100 40GB SXM4 GPU:
+              <code
+                ><!--i18n:114-->
+                Cost = generation seconds ÷ 3,600 × 1.99 </code
+              ><!--i18n:115-->. Local costs estimate the generation stage only.
+              They exclude model loading, input preparation, scoring, additional
+              storage, and taxes, so their accounting scope differs from API
+              charges.
+            </p>
+          </div>
+        </section>
+        <section id="results">
+          <div class="prose">
+            <h2>
+              <span class="section-number">4</span
+              ><!--i18n:8-->
+              Evaluation results
+            </h2>
+            <p>
+              <!--i18n:116-->
+              Table 1 lists the 13 selected models in descending order of
+              test-set score. WebMiner Model 2B full scores 79.50 and ranks
+              second in this group, 1.67 points above GPT-4.1 and 3.67 points
+              below GPT-5.6 terra.
+            </p>
+          </div>
+          <figure class="figure chart-figure">
+            <div class="figure-heading">
+              <!--i18n:117-->
+              Offline score comparison
+            </div>
+            <div
+              class="figure-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="Model score chart; scroll horizontally to view"
+              data-i18n-aria-label="118"
+              data-i18n-data-scroll-hint="162"
+              data-scroll-hint="Scroll horizontally to view the chart"
+            >
+              <svg
+                id="score-chart"
+                role="img"
+                aria-labelledby="score-chart-title score-chart-desc"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                viewBox="0 0 736.615625 406.663975"
+                xmlns="http://www.w3.org/2000/svg"
+                version="1.1"
+              >
+                <title id="score-chart-title">
+                  <!--i18n:119--> Offline scores for 13 models
+                </title>
+                <desc id="score-chart-desc">
+                  <!--i18n:120-->
+                  Offline scores in descending order, with a zero baseline. Blue
+                  denotes WebMiner Model, gray denotes API models, and brown
+                  denotes Qwen base models. Full values are in Table 1.
+                </desc>
+                <defs></defs>
+                <g id="score-chart-figure_1">
+                  <g id="score-chart-patch_1">
+                    <path
+                      d="M 0 406.663975 L 736.615625 406.663975 L 736.615625 0 L 0 0 z"
+                      style="fill: #ffffff"
+                    ></path>
+                  </g>
+                  <g id="score-chart-axes_1">
+                    <g id="score-chart-patch_2">
+                      <path
+                        d="M 174.111875 365.167725 L 718.431875 365.167725 L 718.431875 42.607725 L 174.111875 42.607725 z"
+                        style="fill: #ffffff"
+                      ></path>
+                    </g>
+                    <g id="score-chart-matplotlib.axis_1">
+                      <g id="score-chart-xtick_1">
+                        <g id="score-chart-line2d_1">
+                          <path
+                            d="M 174.111875 365.167725 L 174.111875 42.607725"
+                            clip-path="url(#score-chart-p22ca3ff721)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="score-chart-line2d_2"></g>
+                        <g id="score-chart-text_1">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="174.111875"
+                            y="376.266162"
+                            transform="rotate(-0 174.111875 376.266162)"
+                          >
+                            0
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-xtick_2">
+                        <g id="score-chart-line2d_3">
+                          <path
+                            d="M 282.975875 365.167725 L 282.975875 42.607725"
+                            clip-path="url(#score-chart-p22ca3ff721)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="score-chart-line2d_4"></g>
+                        <g id="score-chart-text_2">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="282.975875"
+                            y="376.266162"
+                            transform="rotate(-0 282.975875 376.266162)"
+                          >
+                            20
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-xtick_3">
+                        <g id="score-chart-line2d_5">
+                          <path
+                            d="M 391.839875 365.167725 L 391.839875 42.607725"
+                            clip-path="url(#score-chart-p22ca3ff721)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="score-chart-line2d_6"></g>
+                        <g id="score-chart-text_3">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="391.839875"
+                            y="376.266162"
+                            transform="rotate(-0 391.839875 376.266162)"
+                          >
+                            40
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-xtick_4">
+                        <g id="score-chart-line2d_7">
+                          <path
+                            d="M 500.703875 365.167725 L 500.703875 42.607725"
+                            clip-path="url(#score-chart-p22ca3ff721)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="score-chart-line2d_8"></g>
+                        <g id="score-chart-text_4">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="500.703875"
+                            y="376.266162"
+                            transform="rotate(-0 500.703875 376.266162)"
+                          >
+                            60
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-xtick_5">
+                        <g id="score-chart-line2d_9">
+                          <path
+                            d="M 609.567875 365.167725 L 609.567875 42.607725"
+                            clip-path="url(#score-chart-p22ca3ff721)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="score-chart-line2d_10"></g>
+                        <g id="score-chart-text_5">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="609.567875"
+                            y="376.266162"
+                            transform="rotate(-0 609.567875 376.266162)"
+                          >
+                            80
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-xtick_6">
+                        <g id="score-chart-line2d_11">
+                          <path
+                            d="M 718.431875 365.167725 L 718.431875 42.607725"
+                            clip-path="url(#score-chart-p22ca3ff721)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="score-chart-line2d_12"></g>
+                        <g id="score-chart-text_6">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="718.431875"
+                            y="376.266162"
+                            transform="rotate(-0 718.431875 376.266162)"
+                          >
+                            100
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-text_7">
+                        <text
+                          style="
+                            fill: #414852;
+                            font: 10px &quot;DejaVu Sans&quot;;
+                            text-anchor: middle;
+                          "
+                          x="446.271875"
+                          y="395.944287"
+                          transform="rotate(-0 446.271875 395.944287)"
+                        >
+                          <!--i18n:165-->
+                          Offline score / 100
+                        </text>
+                      </g>
+                    </g>
+                    <g id="score-chart-matplotlib.axis_2">
+                      <g id="score-chart-ytick_1">
+                        <g id="score-chart-line2d_13"></g>
+                        <g id="score-chart-text_8">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="68.05058"
+                            transform="rotate(-0 164.111875 68.05058)"
+                          >
+                            GPT-5.6 terra
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_2">
+                        <g id="score-chart-line2d_14"></g>
+                        <g id="score-chart-text_9">
+                          <text
+                            style="
+                              fill: #2c659a;
+                              font: 700 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="91.323307"
+                            transform="rotate(-0 164.111875 91.323307)"
+                          >
+                            WebMiner Model 2B full
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_3">
+                        <g id="score-chart-line2d_15"></g>
+                        <g id="score-chart-text_10">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="114.596035"
+                            transform="rotate(-0 164.111875 114.596035)"
+                          >
+                            GPT-4.1
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_4">
+                        <g id="score-chart-line2d_16"></g>
+                        <g id="score-chart-text_11">
+                          <text
+                            style="
+                              fill: #2c659a;
+                              font: 700 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="137.868762"
+                            transform="rotate(-0 164.111875 137.868762)"
+                          >
+                            WebMiner Model 2B LoRA
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_5">
+                        <g id="score-chart-line2d_17"></g>
+                        <g id="score-chart-text_12">
+                          <text
+                            style="
+                              fill: #2c659a;
+                              font: 700 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="161.141489"
+                            transform="rotate(-0 164.111875 161.141489)"
+                          >
+                            WebMiner Model 0.8B full
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_6">
+                        <g id="score-chart-line2d_18"></g>
+                        <g id="score-chart-text_13">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="184.414216"
+                            transform="rotate(-0 164.111875 184.414216)"
+                          >
+                            GPT-5.6 luna
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_7">
+                        <g id="score-chart-line2d_19"></g>
+                        <g id="score-chart-text_14">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="207.686944"
+                            transform="rotate(-0 164.111875 207.686944)"
+                          >
+                            GPT-5
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_8">
+                        <g id="score-chart-line2d_20"></g>
+                        <g id="score-chart-text_15">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="230.959671"
+                            transform="rotate(-0 164.111875 230.959671)"
+                          >
+                            GPT-4.1 mini
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_9">
+                        <g id="score-chart-line2d_21"></g>
+                        <g id="score-chart-text_16">
+                          <text
+                            style="
+                              fill: #2c659a;
+                              font: 700 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="254.232398"
+                            transform="rotate(-0 164.111875 254.232398)"
+                          >
+                            WebMiner Model 0.8B LoRA
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_10">
+                        <g id="score-chart-line2d_22"></g>
+                        <g id="score-chart-text_17">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="277.505126"
+                            transform="rotate(-0 164.111875 277.505126)"
+                          >
+                            GPT-OSS-120B
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_11">
+                        <g id="score-chart-line2d_23"></g>
+                        <g id="score-chart-text_18">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="300.777853"
+                            transform="rotate(-0 164.111875 300.777853)"
+                          >
+                            <!--i18n:137-->
+                            Qwen3.5-0.8B base
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_12">
+                        <g id="score-chart-line2d_24"></g>
+                        <g id="score-chart-text_19">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="324.05058"
+                            transform="rotate(-0 164.111875 324.05058)"
+                          >
+                            <!--i18n:139-->
+                            Qwen3.5-2B base
+                          </text>
+                        </g>
+                      </g>
+                      <g id="score-chart-ytick_13">
+                        <g id="score-chart-line2d_25"></g>
+                        <g id="score-chart-text_20">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="164.111875"
+                            y="347.323307"
+                            transform="rotate(-0 164.111875 347.323307)"
+                          >
+                            GPT-4.1 nano
+                          </text>
+                        </g>
+                      </g>
+                    </g>
+                    <g id="score-chart-patch_3">
+                      <path
+                        d="M 174.111875 365.167725 L 718.431875 365.167725"
+                        style="
+                          fill: none;
+                          stroke: #ccd0d5;
+                          stroke-width: 0.8;
+                          stroke-linejoin: miter;
+                          stroke-linecap: square;
+                        "
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_4">
+                      <path
+                        d="M 174.111875 57.269543 L 626.822819 57.269543 L 626.822819 71.23318 L 174.111875 71.23318 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #939da8"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_5">
+                      <path
+                        d="M 174.111875 80.54227 L 606.846275 80.54227 L 606.846275 94.505907 L 174.111875 94.505907 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #2c659a"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_6">
+                      <path
+                        d="M 174.111875 103.814998 L 597.756131 103.814998 L 597.756131 117.778634 L 174.111875 117.778634 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #939da8"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_7">
+                      <path
+                        d="M 174.111875 127.087725 L 591.333155 127.087725 L 591.333155 141.051361 L 174.111875 141.051361 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #2c659a"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_8">
+                      <path
+                        d="M 174.111875 150.360452 L 588.938147 150.360452 L 588.938147 164.324089 L 174.111875 164.324089 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #2c659a"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_9">
+                      <path
+                        d="M 174.111875 173.63318 L 582.950627 173.63318 L 582.950627 187.596816 L 174.111875 187.596816 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #939da8"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_10">
+                      <path
+                        d="M 174.111875 196.905907 L 582.188579 196.905907 L 582.188579 210.869543 L 174.111875 210.869543 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #939da8"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_11">
+                      <path
+                        d="M 174.111875 220.178634 L 563.953859 220.178634 L 563.953859 234.14227 L 174.111875 234.14227 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #939da8"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_12">
+                      <path
+                        d="M 174.111875 243.451361 L 560.742371 243.451361 L 560.742371 257.414998 L 174.111875 257.414998 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #2c659a"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_13">
+                      <path
+                        d="M 174.111875 266.724089 L 497.710115 266.724089 L 497.710115 280.687725 L 174.111875 280.687725 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #939da8"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_14">
+                      <path
+                        d="M 174.111875 289.996816 L 489.599747 289.996816 L 489.599747 303.960452 L 174.111875 303.960452 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #ba8756"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_15">
+                      <path
+                        d="M 174.111875 313.269543 L 424.390211 313.269543 L 424.390211 327.23318 L 174.111875 327.23318 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #ba8756"
+                      ></path>
+                    </g>
+                    <g id="score-chart-patch_16">
+                      <path
+                        d="M 174.111875 336.54227 L 399.623651 336.54227 L 399.623651 350.505907 L 174.111875 350.505907 z"
+                        clip-path="url(#score-chart-p22ca3ff721)"
+                        style="fill: #939da8"
+                      ></path>
+                    </g>
+                    <g id="score-chart-text_21">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="632.810339"
+                        y="67.010736"
+                        transform="rotate(-0 632.810339 67.010736)"
+                      >
+                        83.17
+                      </text>
+                    </g>
+                    <g id="score-chart-text_22">
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="612.833795"
+                        y="90.283464"
+                        transform="rotate(-0 612.833795 90.283464)"
+                      >
+                        79.50
+                      </text>
+                    </g>
+                    <g id="score-chart-text_23">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="603.743651"
+                        y="113.556191"
+                        transform="rotate(-0 603.743651 113.556191)"
+                      >
+                        77.83
+                      </text>
+                    </g>
+                    <g id="score-chart-text_24">
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="597.320675"
+                        y="136.828918"
+                        transform="rotate(-0 597.320675 136.828918)"
+                      >
+                        76.65
+                      </text>
+                    </g>
+                    <g id="score-chart-text_25">
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="594.925667"
+                        y="160.101645"
+                        transform="rotate(-0 594.925667 160.101645)"
+                      >
+                        76.21
+                      </text>
+                    </g>
+                    <g id="score-chart-text_26">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="588.938147"
+                        y="183.374373"
+                        transform="rotate(-0 588.938147 183.374373)"
+                      >
+                        75.11
+                      </text>
+                    </g>
+                    <g id="score-chart-text_27">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="588.176099"
+                        y="206.6471"
+                        transform="rotate(-0 588.176099 206.6471)"
+                      >
+                        74.97
+                      </text>
+                    </g>
+                    <g id="score-chart-text_28">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="569.941379"
+                        y="229.919827"
+                        transform="rotate(-0 569.941379 229.919827)"
+                      >
+                        71.62
+                      </text>
+                    </g>
+                    <g id="score-chart-text_29">
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="566.729891"
+                        y="253.192555"
+                        transform="rotate(-0 566.729891 253.192555)"
+                      >
+                        71.03
+                      </text>
+                    </g>
+                    <g id="score-chart-text_30">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="503.697635"
+                        y="276.465282"
+                        transform="rotate(-0 503.697635 276.465282)"
+                      >
+                        59.45
+                      </text>
+                    </g>
+                    <g id="score-chart-text_31">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="495.587267"
+                        y="299.738009"
+                        transform="rotate(-0 495.587267 299.738009)"
+                      >
+                        57.96
+                      </text>
+                    </g>
+                    <g id="score-chart-text_32">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="430.377731"
+                        y="323.010736"
+                        transform="rotate(-0 430.377731 323.010736)"
+                      >
+                        45.98
+                      </text>
+                    </g>
+                    <g id="score-chart-text_33">
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 10px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="405.611171"
+                        y="346.283464"
+                        transform="rotate(-0 405.611171 346.283464)"
+                      >
+                        41.43
+                      </text>
+                    </g>
+                    <g id="score-chart-legend_1">
+                      <g id="score-chart-line2d_26">
+                        <path
+                          d="M 183.111875 16.738438 L 188.111875 16.738438 L 193.111875 16.738438"
+                          style="
+                            fill: none;
+                            stroke: #2c659a;
+                            stroke-width: 6;
+                            stroke-linecap: square;
+                          "
+                        ></path>
+                      </g>
+                      <g id="score-chart-text_34">
+                        <text
+                          style="
+                            font: 10px &quot;DejaVu Sans&quot;;
+                            text-anchor: start;
+                          "
+                          x="201.111875"
+                          y="20.238438"
+                          transform="rotate(-0 201.111875 20.238438)"
+                        >
+                          WebMiner Model
+                        </text>
+                      </g>
+                      <g id="score-chart-line2d_27">
+                        <path
+                          d="M 304.125938 16.738438 L 309.125938 16.738438 L 314.125938 16.738438"
+                          style="
+                            fill: none;
+                            stroke: #939da8;
+                            stroke-width: 6;
+                            stroke-linecap: square;
+                          "
+                        ></path>
+                      </g>
+                      <g id="score-chart-text_35">
+                        <text
+                          style="
+                            font: 10px &quot;DejaVu Sans&quot;;
+                            text-anchor: start;
+                          "
+                          x="322.125938"
+                          y="20.238438"
+                          transform="rotate(-0 322.125938 20.238438)"
+                        >
+                          <!--i18n:163-->
+                          API models
+                        </text>
+                      </g>
+                      <g id="score-chart-line2d_28">
+                        <path
+                          d="M 397.472813 16.738438 L 402.472813 16.738438 L 407.472813 16.738438"
+                          style="
+                            fill: none;
+                            stroke: #ba8756;
+                            stroke-width: 6;
+                            stroke-linecap: square;
+                          "
+                        ></path>
+                      </g>
+                      <g id="score-chart-text_36">
+                        <text
+                          style="
+                            font: 10px &quot;DejaVu Sans&quot;;
+                            text-anchor: start;
+                          "
+                          x="415.472813"
+                          y="20.238438"
+                          transform="rotate(-0 415.472813 20.238438)"
+                        >
+                          <!--i18n:164-->
+                          Qwen3.5 base
+                        </text>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+                <defs>
+                  <clipPath id="score-chart-p22ca3ff721">
+                    <rect
+                      x="174.111875"
+                      y="42.607725"
+                      width="544.32"
+                      height="322.56"
+                    ></rect>
+                  </clipPath>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>
+              <strong
+                ><!--i18n:121-->
+                Figure 3. Test-set offline scores. </strong
+              ><!--i18n:122-->
+              The horizontal axis spans the full 0–100 range. Blue denotes
+              WebMiner Model, gray denotes API models, and brown denotes Qwen3.5
+              base models. Failed examples receive zero points.
+            </figcaption>
+          </figure>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="Evaluation details for 13 models; scroll horizontally to view"
+            data-i18n-aria-label="123"
+          >
+            <table id="ranking">
+              <caption>
+                <!--i18n:124-->
+                Table 1. Test-set scores, failures, and total costs
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <!--i18n:125-->
+                    Rank
+                  </th>
+                  <th scope="col">
+                    <!--i18n:126-->
+                    Model
+                  </th>
+                  <th scope="col">
+                    <!--i18n:127-->
+                    Reasoning
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:128-->
+                    Score /100
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:129-->
+                    Failures
+                  </th>
+                  <th scope="col" class="num">
+                    <!--i18n:130-->
+                    Cost (USD)
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  data-name="GPT-5.6 terra"
+                  data-score="83.17"
+                  data-cost="2.7621"
+                  data-kind="api"
+                  class=""
+                >
+                  <td>1</td>
+                  <th scope="row">GPT-5.6 terra</th>
+                  <td>
+                    <!--i18n:131-->
+                    Off
+                  </td>
+                  <td class="num">83.17</td>
+                  <td class="num">0</td>
+                  <td class="num">$2.7621</td>
+                </tr>
+                <tr
+                  data-name="WebMiner Model 2B full"
+                  data-score="79.50"
+                  data-cost="0.0815"
+                  data-kind="webminer"
+                  class="ours"
+                >
+                  <td>2</td>
+                  <th scope="row">WebMiner Model 2B full</th>
+                  <td>
+                    <!--i18n:131-->
+                    Off
+                  </td>
+                  <td class="num">79.50</td>
+                  <td class="num">0</td>
+                  <td class="num">
+                    ≈$0.0815<small
+                      ><!--i18n:132-->
+                      147.5 s; $1.99/h
+                    </small>
+                  </td>
+                </tr>
+                <tr
+                  data-name="GPT-4.1"
+                  data-score="77.83"
+                  data-cost="3.0920"
+                  data-kind="api"
+                  class=""
+                >
+                  <td>3</td>
+                  <th scope="row">GPT-4.1</th>
+                  <td>
+                    <!--i18n:133-->
+                    Not supported
+                  </td>
+                  <td class="num">77.83</td>
+                  <td class="num">0</td>
+                  <td class="num">$3.0920</td>
+                </tr>
+                <tr
+                  data-name="WebMiner Model 2B LoRA"
+                  data-score="76.65"
+                  data-cost="0.0708"
+                  data-kind="webminer"
+                  class="ours"
+                >
+                  <td>4</td>
+                  <th scope="row">WebMiner Model 2B LoRA</th>
+                  <td>
+                    <!--i18n:131-->
+                    Off
+                  </td>
+                  <td class="num">76.65</td>
+                  <td class="num">0</td>
+                  <td class="num">
+                    ≈$0.0708<small
+                      ><!--i18n:134-->
+                      128.1 s; $1.99/h
+                    </small>
+                  </td>
+                </tr>
+                <tr
+                  data-name="WebMiner Model 0.8B full"
+                  data-score="76.21"
+                  data-cost="0.0666"
+                  data-kind="webminer"
+                  class="ours"
+                >
+                  <td>5</td>
+                  <th scope="row">WebMiner Model 0.8B full</th>
+                  <td>
+                    <!--i18n:131-->
+                    Off
+                  </td>
+                  <td class="num">76.21</td>
+                  <td class="num">0</td>
+                  <td class="num">
+                    ≈$0.0666<small
+                      ><!--i18n:135-->
+                      120.5 s; $1.99/h
+                    </small>
+                  </td>
+                </tr>
+                <tr
+                  data-name="GPT-5.6 luna"
+                  data-score="75.11"
+                  data-cost="0.2757"
+                  data-kind="api"
+                  class=""
+                >
+                  <td>6</td>
+                  <th scope="row">GPT-5.6 luna</th>
+                  <td>
+                    <!--i18n:131-->
+                    Off
+                  </td>
+                  <td class="num">75.11</td>
+                  <td class="num">0</td>
+                  <td class="num">$0.2757</td>
+                </tr>
+                <tr
+                  data-name="GPT-5"
+                  data-score="74.97"
+                  data-cost="1.5888"
+                  data-kind="api"
+                  class=""
+                >
+                  <td>7</td>
+                  <th scope="row">GPT-5</th>
+                  <td>minimal</td>
+                  <td class="num">74.97</td>
+                  <td class="num">0</td>
+                  <td class="num">$1.5888</td>
+                </tr>
+                <tr
+                  data-name="GPT-4.1 mini"
+                  data-score="71.62"
+                  data-cost="0.5320"
+                  data-kind="api"
+                  class=""
+                >
+                  <td>8</td>
+                  <th scope="row">GPT-4.1 mini</th>
+                  <td>
+                    <!--i18n:133-->
+                    Not supported
+                  </td>
+                  <td class="num">71.62</td>
+                  <td class="num">0</td>
+                  <td class="num">$0.5320</td>
+                </tr>
+                <tr
+                  data-name="WebMiner Model 0.8B LoRA"
+                  data-score="71.03"
+                  data-cost="0.0677"
+                  data-kind="webminer"
+                  class="ours"
+                >
+                  <td>9</td>
+                  <th scope="row">WebMiner Model 0.8B LoRA</th>
+                  <td>
+                    <!--i18n:131-->
+                    Off
+                  </td>
+                  <td class="num">71.03</td>
+                  <td class="num">0</td>
+                  <td class="num">
+                    ≈$0.0677<small
+                      ><!--i18n:136-->
+                      122.5 s; $1.99/h
+                    </small>
+                  </td>
+                </tr>
+                <tr
+                  data-name="GPT-OSS-120B"
+                  data-score="59.45"
+                  data-cost="0.0869"
+                  data-kind="api"
+                  class=""
+                >
+                  <td>10</td>
+                  <th scope="row">GPT-OSS-120B</th>
+                  <td>low</td>
+                  <td class="num">59.45</td>
+                  <td class="num">1</td>
+                  <td class="num">$0.0869</td>
+                </tr>
+                <tr
+                  data-name="Qwen3.5-0.8B 基座"
+                  data-score="57.96"
+                  data-cost="0.1106"
+                  data-kind="base"
+                  class=""
+                >
+                  <td>11</td>
+                  <th scope="row">
+                    <!--i18n:137-->
+                    Qwen3.5-0.8B base
+                  </th>
+                  <td>
+                    <!--i18n:131-->
+                    Off
+                  </td>
+                  <td class="num">57.96</td>
+                  <td class="num">0</td>
+                  <td class="num">
+                    ≈$0.1106<small
+                      ><!--i18n:138-->
+                      200.0 s; $1.99/h
+                    </small>
+                  </td>
+                </tr>
+                <tr
+                  data-name="Qwen3.5-2B 基座"
+                  data-score="45.98"
+                  data-cost="0.0746"
+                  data-kind="base"
+                  class=""
+                >
+                  <td>12</td>
+                  <th scope="row">
+                    <!--i18n:139-->
+                    Qwen3.5-2B base
+                  </th>
+                  <td>
+                    <!--i18n:131-->
+                    Off
+                  </td>
+                  <td class="num">45.98</td>
+                  <td class="num">0</td>
+                  <td class="num">
+                    ≈$0.0746<small
+                      ><!--i18n:140-->
+                      134.9 s; $1.99/h
+                    </small>
+                  </td>
+                </tr>
+                <tr
+                  data-name="GPT-4.1 nano"
+                  data-score="41.43"
+                  data-cost="0.1219"
+                  data-kind="api"
+                >
+                  <td>13</td>
+                  <th scope="row">GPT-4.1 nano</th>
+                  <td>
+                    <!--i18n:133-->
+                    Not supported
+                  </td>
+                  <td class="num">41.43</td>
+                  <td class="num">0</td>
+                  <td class="num">
+                    $0.1219<small
+                      ><!--i18n:141-->
+                      Average: $0.001219 / example
+                    </small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note prose">
+            <!--i18n:142-->
+            ≈ indicates an estimate for local generation costs. “Not supported”
+            refers to reasoning; minimal and low are the actual reasoning levels
+            used. The source report includes other models; this page presents
+            only the 13 listed above.
+          </p>
+          <figure class="figure chart-figure">
+            <div class="figure-heading">
+              <!--i18n:143-->
+              Score and generation cost
+            </div>
+            <div
+              class="figure-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="Score–cost scatter plot; scroll horizontally to view"
+              data-i18n-aria-label="144"
+              data-i18n-data-scroll-hint="162"
+              data-scroll-hint="Scroll horizontally to view the chart"
+            >
+              <svg
+                id="cost-chart"
+                role="img"
+                aria-labelledby="cost-chart-title cost-chart-desc"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                viewBox="0 0 731.325625 396.173603"
+                xmlns="http://www.w3.org/2000/svg"
+                version="1.1"
+              >
+                <title id="cost-chart-title">
+                  <!--i18n:145--> Offline score and cost per 100 test examples
+                </title>
+                <desc id="cost-chart-desc">
+                  <!--i18n:146-->
+                  The horizontal axis shows cost in USD on a logarithmic scale;
+                  the vertical axis spans scores from 40 to 90. Each point is
+                  labeled with its model name. API costs are recorded charges;
+                  local costs are generation-stage estimates, not total
+                  deployment costs.
+                </desc>
+                <defs></defs>
+                <g id="cost-chart-figure_1">
+                  <g id="cost-chart-patch_1">
+                    <path
+                      d="M 0 396.173603 L 731.325625 396.173603 L 731.325625 0 L 0 0 z"
+                      style="fill: #ffffff"
+                    ></path>
+                  </g>
+                  <g id="cost-chart-axes_1">
+                    <g id="cost-chart-patch_2">
+                      <path
+                        d="M 51.043125 348.177352 L 716.323125 348.177352 L 716.323125 52.689352 L 51.043125 52.689352 z"
+                        style="fill: #ffffff"
+                      ></path>
+                    </g>
+                    <g id="cost-chart-matplotlib.axis_1">
+                      <g id="cost-chart-xtick_1">
+                        <g id="cost-chart-line2d_1">
+                          <path
+                            d="M 65.923453 348.177352 L 65.923453 52.689352"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_2"></g>
+                        <g id="cost-chart-text_1">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="65.923453"
+                            y="363.77579"
+                            transform="rotate(-0 65.923453 363.77579)"
+                          >
+                            $0.05
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-xtick_2">
+                        <g id="cost-chart-line2d_3">
+                          <path
+                            d="M 163.818359 348.177352 L 163.818359 52.689352"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_4"></g>
+                        <g id="cost-chart-text_2">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="163.818359"
+                            y="363.77579"
+                            transform="rotate(-0 163.818359 363.77579)"
+                          >
+                            $0.10
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-xtick_3">
+                        <g id="cost-chart-line2d_5">
+                          <path
+                            d="M 261.713264 348.177352 L 261.713264 52.689352"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_6"></g>
+                        <g id="cost-chart-text_3">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="261.713264"
+                            y="363.77579"
+                            transform="rotate(-0 261.713264 363.77579)"
+                          >
+                            $0.20
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-xtick_4">
+                        <g id="cost-chart-line2d_7">
+                          <path
+                            d="M 391.123289 348.177352 L 391.123289 52.689352"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_8"></g>
+                        <g id="cost-chart-text_4">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="391.123289"
+                            y="363.77579"
+                            transform="rotate(-0 391.123289 363.77579)"
+                          >
+                            $0.50
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-xtick_5">
+                        <g id="cost-chart-line2d_9">
+                          <path
+                            d="M 489.018194 348.177352 L 489.018194 52.689352"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_10"></g>
+                        <g id="cost-chart-text_5">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="489.018194"
+                            y="363.77579"
+                            transform="rotate(-0 489.018194 363.77579)"
+                          >
+                            $1
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-xtick_6">
+                        <g id="cost-chart-line2d_11">
+                          <path
+                            d="M 586.9131 348.177352 L 586.9131 52.689352"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_12"></g>
+                        <g id="cost-chart-text_6">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="586.9131"
+                            y="363.77579"
+                            transform="rotate(-0 586.9131 363.77579)"
+                          >
+                            $2
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-xtick_7">
+                        <g id="cost-chart-line2d_13">
+                          <path
+                            d="M 716.323125 348.177352 L 716.323125 52.689352"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_14"></g>
+                        <g id="cost-chart-text_7">
+                          <text
+                            style="
+                              fill: #59616b;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: middle;
+                            "
+                            x="716.323125"
+                            y="363.77579"
+                            transform="rotate(-0 716.323125 363.77579)"
+                          >
+                            $5
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-text_8">
+                        <text
+                          style="
+                            fill: #414852;
+                            font: 10px &quot;DejaVu Sans&quot;;
+                            text-anchor: middle;
+                          "
+                          x="383.683125"
+                          y="385.453915"
+                          transform="rotate(-0 383.683125 385.453915)"
+                        >
+                          <!--i18n:166-->
+                          Cost per 100 examples (USD, log scale)
+                        </text>
+                      </g>
+                    </g>
+                    <g id="cost-chart-matplotlib.axis_2">
+                      <g id="cost-chart-ytick_1">
+                        <g id="cost-chart-line2d_15">
+                          <path
+                            d="M 51.043125 348.177353 L 716.323125 348.177353"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_16"></g>
+                        <g id="cost-chart-text_9">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="43.043125"
+                            y="351.976571"
+                            transform="rotate(-0 43.043125 351.976571)"
+                          >
+                            40
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-ytick_2">
+                        <g id="cost-chart-line2d_17">
+                          <path
+                            d="M 51.043125 289.079753 L 716.323125 289.079753"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_18"></g>
+                        <g id="cost-chart-text_10">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="43.043125"
+                            y="292.878971"
+                            transform="rotate(-0 43.043125 292.878971)"
+                          >
+                            50
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-ytick_3">
+                        <g id="cost-chart-line2d_19">
+                          <path
+                            d="M 51.043125 229.982153 L 716.323125 229.982153"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_20"></g>
+                        <g id="cost-chart-text_11">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="43.043125"
+                            y="233.781371"
+                            transform="rotate(-0 43.043125 233.781371)"
+                          >
+                            60
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-ytick_4">
+                        <g id="cost-chart-line2d_21">
+                          <path
+                            d="M 51.043125 170.884552 L 716.323125 170.884552"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_22"></g>
+                        <g id="cost-chart-text_12">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="43.043125"
+                            y="174.683771"
+                            transform="rotate(-0 43.043125 174.683771)"
+                          >
+                            70
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-ytick_5">
+                        <g id="cost-chart-line2d_23">
+                          <path
+                            d="M 51.043125 111.786952 L 716.323125 111.786952"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_24"></g>
+                        <g id="cost-chart-text_13">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="43.043125"
+                            y="115.586171"
+                            transform="rotate(-0 43.043125 115.586171)"
+                          >
+                            80
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-ytick_6">
+                        <g id="cost-chart-line2d_25">
+                          <path
+                            d="M 51.043125 52.689353 L 716.323125 52.689353"
+                            clip-path="url(#cost-chart-p805e0188ab)"
+                            style="
+                              fill: none;
+                              stroke: #e8ebee;
+                              stroke-width: 0.7;
+                              stroke-linecap: square;
+                            "
+                          ></path>
+                        </g>
+                        <g id="cost-chart-line2d_26"></g>
+                        <g id="cost-chart-text_14">
+                          <text
+                            style="
+                              fill: #414852;
+                              font: 10px &quot;DejaVu Sans&quot;;
+                              text-anchor: end;
+                            "
+                            x="43.043125"
+                            y="56.488571"
+                            transform="rotate(-0 43.043125 56.488571)"
+                          >
+                            90
+                          </text>
+                        </g>
+                      </g>
+                      <g id="cost-chart-text_15">
+                        <text
+                          style="
+                            fill: #414852;
+                            font: 10px &quot;DejaVu Sans&quot;;
+                            text-anchor: middle;
+                          "
+                          x="16.238437"
+                          y="200.433352"
+                          transform="rotate(-90 16.238437 200.433352)"
+                        >
+                          <!--i18n:165-->
+                          Offline score / 100
+                        </text>
+                      </g>
+                    </g>
+                    <g id="cost-chart-patch_3">
+                      <path
+                        d="M 51.043125 348.177353 L 51.043125 52.689353"
+                        style="
+                          fill: none;
+                          stroke: #ccd0d5;
+                          stroke-width: 0.8;
+                          stroke-linejoin: miter;
+                          stroke-linecap: square;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-patch_4">
+                      <path
+                        d="M 51.043125 348.177352 L 716.323125 348.177352"
+                        style="
+                          fill: none;
+                          stroke: #ccd0d5;
+                          stroke-width: 0.8;
+                          stroke-linejoin: miter;
+                          stroke-linecap: square;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-PathCollection_1">
+                      <defs>
+                        <path
+                          id="cost-chart-m6c97e66789"
+                          d="M 0 3.278719 C 0.869527 3.278719 1.703557 2.933253 2.318405 2.318405 C 2.933253 1.703557 3.278719 0.869527 3.278719 0 C 3.278719 -0.869527 2.933253 -1.703557 2.318405 -2.318405 C 1.703557 -2.933253 0.869527 -3.278719 0 -3.278719 C -0.869527 -3.278719 -1.703557 -2.933253 -2.318405 -2.318405 C -2.933253 -1.703557 -3.278719 -0.869527 -3.278719 0 C -3.278719 0.869527 -2.933253 1.703557 -2.318405 2.318405 C -1.703557 2.933253 -0.869527 3.278719 0 3.278719 z"
+                          style="stroke: #ffffff"
+                        ></path>
+                      </defs>
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m6c97e66789"
+                          x="632.509174"
+                          y="93.053013"
+                          style="fill: #939da8; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_2">
+                      <defs>
+                        <path
+                          id="cost-chart-m83a7a23a72"
+                          d="M 0 3.774917 C 1.00112 3.774917 1.961371 3.377168 2.66927 2.66927 C 3.377168 1.961371 3.774917 1.00112 3.774917 0 C 3.774917 -1.00112 3.377168 -1.961371 2.66927 -2.66927 C 1.961371 -3.377168 1.00112 -3.774917 0 -3.774917 C -1.00112 -3.774917 -1.961371 -3.377168 -2.66927 -2.66927 C -3.377168 -1.961371 -3.774917 -1.00112 -3.774917 0 C -3.774917 1.00112 -3.377168 1.961371 -2.66927 2.66927 C -1.961371 3.377168 -1.00112 3.774917 0 3.774917 z"
+                          style="stroke: #ffffff"
+                        ></path>
+                      </defs>
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m83a7a23a72"
+                          x="134.926828"
+                          y="114.741832"
+                          style="fill: #2c659a; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_3">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m6c97e66789"
+                          x="648.443994"
+                          y="124.611132"
+                          style="fill: #939da8; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_4">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m83a7a23a72"
+                          x="115.049199"
+                          y="131.584648"
+                          style="fill: #2c659a; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_5">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m83a7a23a72"
+                          x="106.412207"
+                          y="134.184943"
+                          style="fill: #2c659a; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_6">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m6c97e66789"
+                          x="307.048323"
+                          y="140.685679"
+                          style="fill: #939da8; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_7">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m6c97e66789"
+                          x="554.405875"
+                          y="141.513045"
+                          style="fill: #939da8; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_8">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m6c97e66789"
+                          x="399.884702"
+                          y="161.310741"
+                          style="fill: #939da8; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_9">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m83a7a23a72"
+                          x="108.725821"
+                          y="164.7975"
+                          style="fill: #2c659a; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_10">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m6c97e66789"
+                          x="143.9876"
+                          y="233.232521"
+                          style="fill: #939da8; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_11">
+                      <defs>
+                        <path
+                          id="cost-chart-md9d9376197"
+                          d="M -0 4.636809 L 4.636809 0 L 0 -4.636809 L -4.636809 -0 z"
+                          style="stroke: #ffffff"
+                        ></path>
+                      </defs>
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-md9d9376197"
+                          x="178.047519"
+                          y="242.038063"
+                          style="fill: #ba8756; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_12">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-md9d9376197"
+                          x="122.433046"
+                          y="312.836988"
+                          style="fill: #ba8756; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-PathCollection_13">
+                      <g clip-path="url(#cost-chart-p805e0188ab)">
+                        <use
+                          xlink:href="#cost-chart-m6c97e66789"
+                          x="191.78675"
+                          y="339.726396"
+                          style="fill: #939da8; stroke: #ffffff"
+                        ></use>
+                      </g>
+                    </g>
+                    <g id="cost-chart-patch_5">
+                      <path
+                        d="M 607.383731 82.800173 Q 617.16922 86.793299 626.954709 90.786425"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_16">
+                      <g id="cost-chart-patch_6">
+                        <path
+                          d="M 559.92933 81.66817 L 621.769174 81.66817 L 621.769174 70.437857 L 559.92933 70.437857 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: end;
+                        "
+                        x="620.509174"
+                        y="78.536451"
+                        transform="rotate(-0 620.509174 78.536451)"
+                      >
+                        GPT-5.6 terra
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_7">
+                      <path
+                        d="M 196.896105 97.212735 Q 168.799256 105.160422 140.702407 113.108109"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_17">
+                      <g id="cost-chart-patch_8">
+                        <path
+                          d="M 193.666828 96.396004 L 281.229796 96.396004 L 281.229796 75.087661 L 193.666828 75.087661 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 9px &quot;DejaVu Sans&quot;;
+                        "
+                        transform="translate(194.926828 83.186254)"
+                      >
+                        WebMiner Model
+                      </text>
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 9px &quot;DejaVu Sans&quot;;
+                        "
+                        transform="translate(194.926828 93.264286)"
+                      >
+                        2B full
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_9">
+                      <path
+                        d="M 663.457293 130.843109 Q 658.71982 128.876598 653.982348 126.910086"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_18">
+                      <g id="cost-chart-patch_10">
+                        <path
+                          d="M 661.183994 143.226288 L 698.339932 143.226288 L 698.339932 131.995975 L 661.183994 131.995975 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="662.443994"
+                        y="140.094569"
+                        transform="rotate(-0 662.443994 140.094569)"
+                      >
+                        GPT-4.1
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_11">
+                      <path
+                        d="M 162.796745 128.553747 Q 141.917393 129.879119 121.038042 131.204491"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_19">
+                      <g id="cost-chart-patch_12">
+                        <path
+                          d="M 165.789199 136.23882 L 253.352167 136.23882 L 253.352167 114.930477 L 165.789199 114.930477 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 9px &quot;DejaVu Sans&quot;;
+                        "
+                        transform="translate(167.049199 123.02907)"
+                      >
+                        WebMiner Model
+                      </text>
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 9px &quot;DejaVu Sans&quot;;
+                        "
+                        transform="translate(167.049199 133.107102)"
+                      >
+                        2B LoRA
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_13">
+                      <path
+                        d="M 122.902886 97.573947 Q 115.890523 113.142112 108.878159 128.710276"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_20">
+                      <g id="cost-chart-patch_14">
+                        <path
+                          d="M 85.152207 94.839115 L 172.715176 94.839115 L 172.715176 73.530771 L 85.152207 73.530771 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 9px &quot;DejaVu Sans&quot;;
+                        "
+                        transform="translate(86.412207 81.629365)"
+                      >
+                        WebMiner Model
+                      </text>
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 9px &quot;DejaVu Sans&quot;;
+                        "
+                        transform="translate(86.412207 91.707396)"
+                      >
+                        0.8B full
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_15">
+                      <path
+                        d="M 325.697277 135.154557 Q 319.247999 137.067358 312.79872 138.98016"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_21">
+                      <g id="cost-chart-patch_16">
+                        <path
+                          d="M 317.788323 134.300835 L 377.227698 134.300835 L 377.227698 123.070523 L 317.788323 123.070523 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="319.048323"
+                        y="131.169116"
+                        transform="rotate(-0 319.048323 131.169116)"
+                      >
+                        GPT-5.6 luna
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_17">
+                      <path
+                        d="M 538.372366 154.967907 Q 544.090371 150.169521 549.808376 145.371135"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_22">
+                      <g id="cost-chart-patch_18">
+                        <path
+                          d="M 515.0965 168.128202 L 543.665875 168.128202 L 543.665875 156.897889 L 515.0965 156.897889 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: end;
+                        "
+                        x="542.405875"
+                        y="164.996483"
+                        transform="rotate(-0 542.405875 164.996483)"
+                      >
+                        GPT-5
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_19">
+                      <path
+                        d="M 422.403527 169.654427 Q 413.957593 166.525035 405.511659 163.395644"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_23">
+                      <g id="cost-chart-patch_20">
+                        <path
+                          d="M 410.624702 181.925898 L 470.11189 181.925898 L 470.11189 170.695585 L 410.624702 170.695585 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="411.884702"
+                        y="178.794179"
+                        transform="rotate(-0 411.884702 178.794179)"
+                      >
+                        GPT-4.1 mini
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_21">
+                      <path
+                        d="M 132.313036 173.143782 Q 123.34834 169.971645 114.383643 166.799507"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_24">
+                      <g id="cost-chart-patch_22">
+                        <path
+                          d="M 121.465821 195.451672 L 209.02879 195.451672 L 209.02879 174.143328 L 121.465821 174.143328 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 9px &quot;DejaVu Sans&quot;;
+                        "
+                        transform="translate(122.725821 182.241922)"
+                      >
+                        WebMiner Model
+                      </text>
+                      <text
+                        style="
+                          fill: #2c659a;
+                          font: 700 9px &quot;DejaVu Sans&quot;;
+                        "
+                        transform="translate(122.725821 192.319953)"
+                      >
+                        0.8B LoRA
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_23">
+                      <path
+                        d="M 118.159316 224.781145 Q 128.22169 228.073694 138.284064 231.366244"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_25">
+                      <g id="cost-chart-patch_24">
+                        <path
+                          d="M 64.044475 223.847677 L 132.2476 223.847677 L 132.2476 212.617364 L 64.044475 212.617364 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: end;
+                        "
+                        x="130.9876"
+                        y="220.715958"
+                        transform="rotate(-0 130.9876 220.715958)"
+                      >
+                        GPT-OSS-120B
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_25">
+                      <path
+                        d="M 205.98354 247.815463 Q 194.953381 245.534335 183.923222 243.253207"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_26">
+                      <g id="cost-chart-patch_26">
+                        <path
+                          d="M 190.787519 259.653219 L 281.35705 259.653219 L 281.35705 248.422907 L 190.787519 248.422907 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="192.047519"
+                        y="256.5215"
+                        transform="rotate(-0 192.047519 256.5215)"
+                      >
+                        <!--i18n:137-->
+                        Qwen3.5-0.8B base
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_27">
+                      <path
+                        d="M 132.190904 311.747363 Q 130.292219 311.959382 128.393535 312.171402"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_27">
+                      <g id="cost-chart-patch_28">
+                        <path
+                          d="M 135.173046 312.452144 L 217.156015 312.452144 L 217.156015 301.221831 L 135.173046 301.221831 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="136.433046"
+                        y="309.320425"
+                        transform="rotate(-0 136.433046 309.320425)"
+                      >
+                        <!--i18n:139-->
+                        Qwen3.5-2B base
+                      </text>
+                    </g>
+                    <g id="cost-chart-patch_29">
+                      <path
+                        d="M 211.22672 334.167217 Q 204.389982 336.122294 197.553245 338.077372"
+                        style="
+                          fill: none;
+                          stroke: #aab2bb;
+                          stroke-width: 0.7;
+                          stroke-linecap: round;
+                        "
+                      ></path>
+                    </g>
+                    <g id="cost-chart-text_28">
+                      <g id="cost-chart-patch_30">
+                        <path
+                          d="M 202.52675 333.341552 L 264.972687 333.341552 L 264.972687 322.111239 L 202.52675 322.111239 z"
+                          style="fill: #ffffff"
+                        ></path>
+                      </g>
+                      <text
+                        style="
+                          fill: #414852;
+                          font: 9px &quot;DejaVu Sans&quot;;
+                          text-anchor: start;
+                        "
+                        x="203.78675"
+                        y="330.209833"
+                        transform="rotate(-0 203.78675 330.209833)"
+                      >
+                        GPT-4.1 nano
+                      </text>
+                    </g>
+                    <g id="cost-chart-legend_1">
+                      <g id="cost-chart-line2d_27">
+                        <path
+                          d="M 59.143125 15.928594 L 68.143125 15.928594 L 77.143125 15.928594"
+                          style="
+                            fill: none;
+                            stroke: #ffffff;
+                            stroke-width: 1.5;
+                            stroke-linecap: square;
+                          "
+                        ></path>
+                        <defs>
+                          <path
+                            id="cost-chart-mbf254b9fd1"
+                            d="M 0 3.5 C 0.928211 3.5 1.81853 3.131218 2.474874 2.474874 C 3.131218 1.81853 3.5 0.928211 3.5 0 C 3.5 -0.928211 3.131218 -1.81853 2.474874 -2.474874 C 1.81853 -3.131218 0.928211 -3.5 0 -3.5 C -0.928211 -3.5 -1.81853 -3.131218 -2.474874 -2.474874 C -3.131218 -1.81853 -3.5 -0.928211 -3.5 0 C -3.5 0.928211 -3.131218 1.81853 -2.474874 2.474874 C -1.81853 3.131218 -0.928211 3.5 0 3.5 z"
+                            style="stroke: #ffffff"
+                          ></path>
+                        </defs>
+                        <g>
+                          <use
+                            xlink:href="#cost-chart-mbf254b9fd1"
+                            x="68.143125"
+                            y="15.928594"
+                            style="fill: #2c659a; stroke: #ffffff"
+                          ></use>
+                        </g>
+                      </g>
+                      <g id="cost-chart-text_29">
+                        <text
+                          style="
+                            font: 9px &quot;DejaVu Sans&quot;;
+                            text-anchor: start;
+                          "
+                          x="80.743125"
+                          y="19.078594"
+                          transform="rotate(-0 80.743125 19.078594)"
+                        >
+                          <!--i18n:167-->
+                          WebMiner Model · estimated
+                        </text>
+                      </g>
+                      <g id="cost-chart-line2d_28">
+                        <path
+                          d="M 221.953125 15.928594 L 230.953125 15.928594 L 239.953125 15.928594"
+                          style="
+                            fill: none;
+                            stroke: #ffffff;
+                            stroke-width: 1.5;
+                            stroke-linecap: square;
+                          "
+                        ></path>
+                        <defs>
+                          <path
+                            id="cost-chart-m3fe328216a"
+                            d="M 0 3.5 C 0.928211 3.5 1.81853 3.131218 2.474874 2.474874 C 3.131218 1.81853 3.5 0.928211 3.5 0 C 3.5 -0.928211 3.131218 -1.81853 2.474874 -2.474874 C 1.81853 -3.131218 0.928211 -3.5 0 -3.5 C -0.928211 -3.5 -1.81853 -3.131218 -2.474874 -2.474874 C -3.131218 -1.81853 -3.5 -0.928211 -3.5 0 C -3.5 0.928211 -3.131218 1.81853 -2.474874 2.474874 C -1.81853 3.131218 -0.928211 3.5 0 3.5 z"
+                            style="stroke: #ffffff"
+                          ></path>
+                        </defs>
+                        <g>
+                          <use
+                            xlink:href="#cost-chart-m3fe328216a"
+                            x="230.953125"
+                            y="15.928594"
+                            style="fill: #939da8; stroke: #ffffff"
+                          ></use>
+                        </g>
+                      </g>
+                      <g id="cost-chart-text_30">
+                        <text
+                          style="
+                            font: 9px &quot;DejaVu Sans&quot;;
+                            text-anchor: start;
+                          "
+                          x="243.553125"
+                          y="19.078594"
+                          transform="rotate(-0 243.553125 19.078594)"
+                        >
+                          <!--i18n:168-->
+                          API · recorded
+                        </text>
+                      </g>
+                      <g id="cost-chart-line2d_29">
+                        <path
+                          d="M 318.970312 15.928594 L 327.970312 15.928594 L 336.970312 15.928594"
+                          style="
+                            fill: none;
+                            stroke: #ffffff;
+                            stroke-width: 1.5;
+                            stroke-linecap: square;
+                          "
+                        ></path>
+                        <defs>
+                          <path
+                            id="cost-chart-mc76076fab3"
+                            d="M -0 4.949747 L 4.949747 0 L 0 -4.949747 L -4.949747 -0 z"
+                            style="stroke: #ffffff; stroke-linejoin: miter"
+                          ></path>
+                        </defs>
+                        <g>
+                          <use
+                            xlink:href="#cost-chart-mc76076fab3"
+                            x="327.970312"
+                            y="15.928594"
+                            style="
+                              fill: #ba8756;
+                              stroke: #ffffff;
+                              stroke-linejoin: miter;
+                            "
+                          ></use>
+                        </g>
+                      </g>
+                      <g id="cost-chart-text_31">
+                        <text
+                          style="
+                            font: 9px &quot;DejaVu Sans&quot;;
+                            text-anchor: start;
+                          "
+                          x="340.570312"
+                          y="19.078594"
+                          transform="rotate(-0 340.570312 19.078594)"
+                        >
+                          <!--i18n:169-->
+                          Qwen3.5 base · estimated
+                        </text>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+                <defs>
+                  <clipPath id="cost-chart-p805e0188ab">
+                    <rect
+                      x="51.043125"
+                      y="52.689352"
+                      width="665.28"
+                      height="295.488"
+                    ></rect>
+                  </clipPath>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>
+              <strong
+                ><!--i18n:147-->
+                Figure 4. Test-set scores and costs. </strong
+              ><!--i18n:148-->
+              The horizontal axis is logarithmic; farther left means lower cost.
+              The vertical axis spans 40–90; higher means a better score. Points
+              are labeled directly. API charges and local estimates cover
+              different cost components.
+            </figcaption>
+          </figure>
+          <div class="prose">
+            <h3>
+              <!--i18n:149-->
+              4.1 Observations
+            </h3>
+            <ul class="findings">
+              <li>
+                <strong
+                  ><!--i18n:150-->
+                  Fine-tuned models outperform their corresponding base models. </strong
+                ><!--i18n:151-->
+                The 2B full and LoRA models exceed the 2B base by 33.52 and
+                30.67 points, respectively. The 0.8B full and LoRA models exceed
+                the 0.8B base by 18.25 and 13.07 points, respectively.
+              </li>
+              <li>
+                <strong
+                  ><!--i18n:152-->
+                  Full fine-tuning scores higher at the same model size. </strong
+                ><!--i18n:153-->
+                2B full exceeds 2B LoRA by 2.85 points, and 0.8B full exceeds
+                0.8B LoRA by 5.18 points. The two methods differ in learning
+                rate and which parameters are updated.
+              </li>
+              <li>
+                <strong
+                  ><!--i18n:154-->
+                  0.8B full has the lowest estimated generation cost in this
+                  evaluation. </strong
+                ><!--i18n:155-->
+                Generating 100 examples takes 120.5 seconds, costing
+                approximately $0.0666 at a score of 76.21. 2B full takes 147.5
+                seconds, costing approximately $0.0815 at a score of 79.50.
+              </li>
+            </ul>
+            <p>
+              <!--i18n:156-->
+              This evaluation shows that small models post-trained specifically
+              for business website extraction can approach GPT-5.6 terra in
+              extraction quality at a lower generation cost.
+            </p>
+          </div>
+        </section>
+      </main>
+      <footer class="footer">
+        <span
+          ><!--i18n:157-->
+          WebMiner Model · Technical report · October 2026 </span
+        ><a href="#top"
+          ><!--i18n:158-->
+          Back to top ↑
+        </a>
+      </footer>
+    </div>
+
+    <!-- Translation indices are referenced by i18n comments and data-i18n attributes.
+         Keep these indices stable when editing the bilingual copy. -->
+    <script id="translations" type="application/json">
+      [
+        {
+          "zh": "WebMiner 技术报告：从 HTML、Markdown 到结构化商家数据，从直接 SFT 到分步监督与五任务混合训练。包含 WebMiner Model 训练方法与 100 条离线评测。",
+          "en": "WebMiner technical report: from HTML and Markdown to structured business data, and from direct SFT to stepwise supervision and five-task mixed SFT. Includes WebMiner Model training methods and an offline evaluation on 100 examples."
+        },
+        {
+          "zh": "WebMiner：通过后训练构建自有模型，实现高质量、低成本的商家网页信息提取",
+          "en": "WebMiner: Post-training Our Own Models for High-quality, Low-cost Business Website Extraction"
+        },
+        { "zh": "跳到正文", "en": "Skip to content" },
+        {
+          "zh": "技术报告 · 2026 年 10 月",
+          "en": "Technical report · October 2026"
+        },
+        {
+          "zh": "通过后训练构建自有模型",
+          "en": "Building our own models through post-training"
+        },
+        {
+          "zh": "实现高质量、低成本的商家网页信息提取",
+          "en": "High-quality, low-cost extraction from business websites"
+        },
+        {
+          "zh": "从直接监督微调到分步监督与五任务混合训练",
+          "en": "From direct supervised fine-tuning to stepwise supervision and five-task mixed training"
+        },
+        { "zh": "训练方法", "en": "Training methods" },
+        { "zh": "评测结果", "en": "Evaluation results" },
+        { "zh": "摘要", "en": "Abstract" },
+        {
+          "zh": "WebMiner 面向商家网页信息提取任务，对开源权重的小规模语言模型进行后训练，实现高质量、低成本的结构化数据提取。 上游任务将 Google Maps 店铺登记网站的 HTML 转换为 Markdown，模型以网站 URL 和完整 Markdown 为输入，提取商家主体、联系方式、业务描述和人员信息。 训练方法由直接学习最终结构化结果的监督微调（SFT），发展为结合主体识别等中间任务与综合输出的五任务混合 SFT。 在测试集上，WebMiner Model 的 2B 全量微调版本在提取质量上超过 GPT-5.6 luna，接近 GPT-5.6 terra； 本地生成成本估算约为 GPT-5.6 terra API 费用的",
+          "en": "WebMiner post-trains small, open-weight language models for high-quality, low-cost structured data extraction from business websites. An upstream task converts the HTML of websites listed by businesses on Google Maps into Markdown. Given the website URL and complete Markdown, the model extracts business identity, contact details, descriptions, and staff information. Our training approach evolved from supervised fine-tuning (SFT) on final structured answers to five-task mixed SFT that combines intermediate tasks, such as business identification, with the final extraction task. On the test set, the fully fine-tuned 2B WebMiner Model exceeds GPT-5.6 luna in extraction quality and approaches GPT-5.6 terra, with estimated local generation costs of approximately"
+        },
+        { "zh": "报告目录", "en": "Report contents" },
+        { "zh": "1. 背景", "en": "1. Background" },
+        { "zh": "2. 训练方法", "en": "2. Methods" },
+        { "zh": "3. 实验设置", "en": "3. Experimental setup" },
+        { "zh": "4. 结果", "en": "4. Results" },
+        { "zh": "背景与任务定义", "en": "Background and task definition" },
+        {
+          "zh": "上游系统按地理区域扫描 Google Maps，保存店铺信息，再访问店铺登记的网站 URL，取得 HTML 并转换为 Markdown。WebMiner 处理这些已经保存的文本，目标是将分散在网页中的商家信息转换为统一的结构化对象。Google Maps 中的目标店铺是归属判断的锚点，网站 URL 与 Markdown 是模型读取的证据。",
+          "en": "The upstream system scans geographic regions on Google Maps, saves business listings, and visits their registered website URLs to retrieve HTML and convert it into Markdown. WebMiner processes this saved text to turn scattered business information into a consistent structured object. The target Google Maps listing anchors decisions about which business the information belongs to; the website URL and Markdown provide the evidence available to the model."
+        },
+        {
+          "zh": "采集起点：Google Maps 店铺及其登记网站 URL",
+          "en": "Collection starts with a Google Maps business listing and its registered website URL"
+        },
+        {
+          "zh": "HTML 网页经上游转换为 Markdown，WebMiner 根据 URL 和 Markdown 提取结构化商家数据",
+          "en": "The upstream system converts HTML into Markdown. WebMiner extracts structured business data from the URL and Markdown."
+        },
+        {
+          "zh": "店铺登记网站的网页",
+          "en": "Pages from the business's registered website"
+        },
+        { "zh": "转换并保存的页面文本", "en": "Converted and saved page text" },
+        { "zh": "结构化数据", "en": "Structured data" },
+        {
+          "zh": "主体 · 联系方式 · 描述 · 人员",
+          "en": "Identity · Contacts · Description · Staff"
+        },
+        {
+          "zh": "图 1. 数据处理流程。",
+          "en": "Figure 1. Data processing pipeline."
+        },
+        {
+          "zh": "HTML → Markdown 由上游完成；WebMiner 的模型输入为 URL 与保存的 Markdown，输出为符合任务 schema 的结果。",
+          "en": "The upstream system handles HTML-to-Markdown conversion. WebMiner takes the URL and saved Markdown as input and returns a result that conforms to the task schema."
+        },
+        {
+          "zh": "提取商家信息之前，模型需要先判断页面是否仍提供目标店铺的有效信息，再确认各项内容的归属。 例如，商家停止维护网站后，原网址可能变成域名服务商的出售页面，此时应判定商家信息不可用，而不是将域名服务商的信息当作商家信息提取。 对于由第三方平台托管的店铺页面，商家介绍、平台客服和顾客评论可能同时出现，模型应聚焦于目标商家：不能将平台客服的电话或邮箱作为商家的联系方式，也不能将评论中的顾客姓名识别为雇员姓名。 因此，字段是否出现在页面上只是识别的起点，是否有证据表明它属于目标商家，才是决定是否提取的依据。",
+          "en": "Before extracting business information, the model must determine whether the page still provides valid information about the target business, then establish which content belongs to it. For example, an abandoned business website may be replaced by a domain-for-sale page. In that case, the business information should be treated as unavailable, rather than extracting the domain provider's details as if they belonged to the business. On a third-party platform, a business profile may appear alongside platform support details and customer reviews. The model must focus on the target business: platform support phone numbers and email addresses must not be attributed to the business, and customer names in reviews must not be mistaken for employee names. A field's presence on the page is only the starting point; evidence that it belongs to the target business determines whether it should be extracted."
+        },
+        {
+          "zh": "除了判断信息归属，模型还需要处理 HTML 转换为 Markdown 时产生的多余空白、转义字符、编码异常和文本粘连等噪声。 训练与评测均使用预先保存并固定的网页文本，提取结果应以这些文本为依据，不凭空补充缺失信息或推测商家关系。 页面能够提供目标商家的有效信息时，模型将其整理为符合预定结构（schema）的",
+          "en": "In addition to resolving attribution, the model must handle noise introduced during HTML-to-Markdown conversion, including excess whitespace, escape characters, encoding errors, and joined text. Training and evaluation use saved, fixed page text. Extraction must be grounded in that text, without inventing missing information or business relationships. When a page provides valid information about the target business, the model organizes it into a schema-compliant"
+        },
+        {
+          "zh": "对象； 页面不适用于商家信息提取时，则返回",
+          "en": "object; when the page is unsuitable for business information extraction, it returns"
+        },
+        { "zh": "从 SFT 到分步 SFT", "en": "From SFT to stepwise SFT" },
+        {
+          "zh": "2.1 直接学习最终结构化输出",
+          "en": "2.1 Learning the final structured output directly"
+        },
+        {
+          "zh": "早期 SFT 将网页输入与最终 teacher 对象配成监督样本：输入任务指令、URL 和 Markdown，模型学习生成完整结构化答案。训练使用标准的自回归监督目标，在给定输入和目标前缀的条件下，预测目标输出的下一个 token。训练样本同时覆盖有效页面与无效页面，使模型既能按规定格式提取商家信息，也能在页面不适用时返回空结果。",
+          "en": "Early SFT paired webpage inputs with final teacher-generated objects. Given the task instructions, URL, and Markdown, the model learned to generate the complete structured answer. Training used the standard autoregressive objective: predicting the next target token conditioned on the input and preceding target tokens. The examples included both valid and invalid pages, teaching the model to extract business information in the required format and to return a null result when a page was unsuitable."
+        },
+        {
+          "zh": "监督微调损失为目标输出 token 的平均负对数概率",
+          "en": "The supervised fine-tuning loss is the mean negative log probability of the target output tokens."
+        },
+        {
+          "zh": "x：指令与网页输入；y：目标输出；只计算目标输出的损失。",
+          "en": "x: instructions and webpage input; y: target output. Loss is computed only on the target output."
+        },
+        {
+          "zh": "直接 SFT 提供了最终结构化答案，却没有显式呈现“先确定商家主体，再围绕该主体提取信息”的任务依赖。 早期训练中的核心困难在于，模型难以仅从输入与最终答案的对应关系中稳定学会这一逻辑，容易将页面中出现的信息直接填入字段，而忽略它是否属于目标商家。 因此，我们转向分步 SFT，将隐含在最终答案中的主体判断、联系方式归属、描述概括和人员筛选显式化。 分步监督将这些判断分别构造成可检查的训练目标，使每项子任务都有明确的输入、标签和校验规则。",
+          "en": "Direct SFT provides the final structured answer but does not explicitly expose the dependency between identifying the business and extracting information about that business. A central difficulty in early training was that the model struggled to learn this dependency reliably from input–answer pairs alone. It could fill fields with information found on the page without checking whether that information belonged to the target business. We therefore moved to stepwise SFT, making business identification, contact attribution, description summarization, and staff selection explicit. Each decision becomes a verifiable training objective with its own inputs, labels, and validation rules."
+        },
+        {
+          "zh": "这些中间任务为模型提供了更细粒度的学习信号，使其分别学习主体识别以及以主体为条件的信息提取能力。 我们将中间任务作为辅助监督，与直接生成最终结果的端到端（E2E）任务联合训练，目的是通过学习各步骤所需的能力，辅助模型掌握完整的信息提取任务。",
+          "en": "These intermediate tasks provide more granular learning signals, allowing the model to learn business identification and extraction conditioned on that identity. We train them as auxiliary objectives alongside the end-to-end (E2E) task of generating the final result. The aim is to support learning the complete extraction task by teaching the capabilities required at each step."
+        },
+        {
+          "zh": "2.2 将提取过程拆为独立监督任务",
+          "en": "2.2 Decomposing extraction into independent supervised tasks"
+        },
+        {
+          "zh": "我们首先为主体识别、联系方式提取、人员提取和业务描述构建四个分步监督任务，再加入直接生成最终结构化结果的综合输出任务，形成五任务混合 SFT。 其中，联系方式提取、人员提取和业务描述均以已确认的商家主体为上下文，分别学习各自的提取目标，彼此不依赖对方的输出。 综合输出任务仅以 URL 和完整 Markdown 为输入，不提供中间任务的答案，使模型同时学习端到端的信息提取能力。",
+          "en": "We first construct four supervised tasks: business identification, contact extraction, staff extraction, and business description. Adding a task that directly generates the final structured result yields five-task mixed SFT. Contact extraction, staff extraction, and business description each receive the confirmed business identity as context and learn their own targets independently, without relying on one another's outputs. The combined task receives only the URL and complete Markdown, with no intermediate answers, so the model also learns end-to-end extraction."
+        },
+        { "zh": "主体监督", "en": "Identity supervision" },
+        { "zh": "主体识别目标", "en": "Business identification target" },
+        {
+          "zh": "身份、服务状态与内容特征",
+          "en": "Identity, service status, and content characteristics"
+        },
+        { "zh": "三项独立监督", "en": "Three independent tasks" },
+        {
+          "zh": "原始资料 + 已确认主体",
+          "en": "Source material + confirmed identity"
+        },
+        {
+          "zh": "各自一条训练对话，不互读结果",
+          "en": "Separate training conversations; no shared outputs"
+        },
+        { "zh": "联系方式", "en": "Contact details" },
+        { "zh": "业务描述", "en": "Business description" },
+        { "zh": "人员信息", "en": "Staff information" },
+        { "zh": "综合监督", "en": "Combined supervision" },
+        {
+          "zh": "不包含中间 teacher 答案",
+          "en": "No intermediate teacher answers"
+        },
+        { "zh": "最终 info 对象 / null", "en": "Final info object / null" },
+        {
+          "zh": "五类记录 → 全局打乱 → 同一模型混合 SFT；评测综合任务时，一次请求直接生成最终结果。",
+          "en": "Five types of records → global shuffle → mixed SFT of one model. Evaluation of the combined task generates the final result in a single request."
+        },
+        {
+          "zh": "图 2. 分步监督与综合监督的关系。",
+          "en": "Figure 2. Stepwise and combined supervision."
+        },
+        {
+          "zh": "“分步”指训练目标的分解。各任务记录在同一轮中混合训练；前置主体答案作为上下文时不重复计算损失。",
+          "en": "Stepwise supervision decomposes the training targets. All task records are mixed within the same epoch; preceding identity answers supplied as context do not contribute additional loss."
+        },
+        {
+          "zh": "五任务输入与训练目标",
+          "en": "Inputs and training targets for the five tasks"
+        },
+        {
+          "zh": "五任务监督的输入与目标",
+          "en": "Inputs and targets for five-task supervision"
+        },
+        { "zh": "任务", "en": "Task" },
+        { "zh": "输入", "en": "Input" },
+        { "zh": "监督目标", "en": "Supervision target" },
+        { "zh": "主体识别", "en": "Business identification" },
+        { "zh": "URL、完整 Markdown", "en": "URL and complete Markdown" },
+        { "zh": "六个主体字段", "en": "Six identity fields" },
+        {
+          "zh": "原始资料、已确认主体、联系候选",
+          "en": "Source material, confirmed identity, and contact candidates"
+        },
+        {
+          "zh": "接受的 emails 与 phones",
+          "en": "Accepted emails and phone numbers"
+        },
+        {
+          "zh": "原始资料、已确认主体",
+          "en": "Source material and confirmed identity"
+        },
+        { "zh": "六个描述字段", "en": "Six description fields" },
+        { "zh": "人员提取", "en": "Staff extraction" },
+        {
+          "zh": "人员及职位，最多 20 人",
+          "en": "Names and roles, up to 20 people"
+        },
+        { "zh": "综合输出", "en": "Combined output" },
+        {
+          "zh": "{\"info\": object 或 null}",
+          "en": "{\"info\": object or null}"
+        },
+        {
+          "zh": "2.3 混合训练与检查点选择",
+          "en": "2.3 Mixed training and checkpoint selection"
+        },
+        {
+          "zh": "同一个商家的网页可以用于构建多个任务的训练样本。训练时，我们将所有任务的样本混合打乱，每轮使用每条样本一次。 每条样本只对当前任务的目标答案计算损失；作为输入上下文提供的主体信息不重复计入损失。 对于被判断为失效或不适合继续提取信息的商家样本，只保留主体判断和返回空结果（",
+          "en": "A single business webpage can produce training examples for several tasks. We shuffle examples from all tasks together and use each example once per epoch. Loss is computed only on the current task's target answer; identity information supplied as input context does not contribute additional loss. For business examples judged invalid or otherwise unsuitable for further extraction, we retain only the identity task and the null-output target ("
+        },
+        {
+          "zh": "）两类训练目标，不再构建联系方式、人员和描述等提取任务。",
+          "en": "), without constructing contact, staff, or description extraction tasks."
+        },
+        {
+          "zh": "为了让训练重点落在最终的信息提取结果上，我们将综合输出任务的损失权重设为 0.5，其余四个分步任务各设为 0.125。 各任务的损失先按目标输出的 token 数归一化，避免较长答案主导训练；每个优化步骤再根据实际参与的任务重新归一化权重。",
+          "en": "To emphasize the final extraction result, we assign a loss weight of 0.5 to the combined task and 0.125 to each of the four intermediate tasks. Each task's loss is first normalized by its target token count so that longer answers do not dominate training. At each optimization step, weights are then renormalized across the tasks present in that step."
+        },
+        {
+          "zh": "训练过程中，我们同时跟踪五个任务在验证集上的损失，并选择综合输出任务验证损失最低的模型检查点，作为最终评测使用的版本。 四组模型使用同一套训练流程和数据，分别从固定版本的 Qwen3.5 原始基座独立训练，以比较 0.8B、2B 两种规模下全量微调与 LoRA 的表现。",
+          "en": "During training, we track validation loss for all five tasks and select the checkpoint with the lowest combined-task validation loss for final evaluation. All four models use the same training workflow and data, each starting independently from a pinned version of the original Qwen3.5 base model. This compares full fine-tuning with LoRA at both 0.8B and 2B scales."
+        },
+        { "zh": "数据与实验设置", "en": "Data and experimental setup" },
+        { "zh": "3.1 数据选择与冻结", "en": "3.1 Data selection and freezing" },
+        {
+          "zh": "训练数据既要覆盖正常的商家信息提取，也要覆盖不同语言以及网站失效、页面内容异常等情况。 为此，我们在选样时保留了 705 条多语言或非英语样本，以及 1,285 条网站服务状态或页面内容被标记为异常的样本。 两组有 118 条重叠，合计 1,872 条不同样本。在此基础上，从其余服务状态和页面内容均正常的商家样本中随机抽取 1,000 条，不重复抽取，并固定随机种子为 42，确保选择过程可以复现。",
+          "en": "The training data must cover standard business extraction as well as different languages, inactive websites, and unusual page content. We therefore retain 705 multilingual or non-English examples and 1,285 examples flagged for abnormal website service status or page content. The groups overlap by 118 examples, giving 1,872 distinct examples. We then sample 1,000 additional examples without replacement from the remaining businesses whose service status and page content are both normal, using a fixed random seed of 42 for reproducibility."
+        },
+        {
+          "zh": "排除超过长度限制或与测试数据重复的训练样本后，最终得到 2,869 个商家样本，按适用任务展开为 13,718 条训练记录。 其中，705 条多语言或非英语样本和额外抽取的 1,000 条正常样本均被保留。 同一商家样本生成的所有任务记录归入同一个数据集，避免分散到训练集、验证集或测试集中。",
+          "en": "After excluding training examples that exceed the length limit or duplicate test data, the dataset contains 2,869 business examples, expanded into 13,718 applicable task records. All 705 multilingual or non-English examples and the 1,000 additionally sampled normal examples are retained. Every task record derived from the same business example stays in the same split, rather than being distributed across training, validation, and test sets."
+        },
+        {
+          "zh": "正式训练前，我们固定网页输入、监督标签和数据划分，并记录样本清单及排除原因，这一过程称为数据冻结。 四组模型使用相同的冻结数据，确保比较时的数据条件一致。网页正文不做截断；超过长度限制或不适用于某项任务的记录会被排除，并保留原因以便核查。",
+          "en": "Before training, we fix the webpage inputs, supervision labels, and data splits, and record the example lists and exclusion reasons. This is the data-freezing process. All four models use the same frozen data to keep the data conditions consistent. Page text is not truncated; records exceeding the length limit or unsuitable for a task are excluded, with reasons retained for review."
+        },
+        {
+          "zh": "训练与验证数据规模",
+          "en": "Training and validation dataset sizes"
+        },
+        {
+          "zh": "WebMiner Model 训练与验证数据规模：商家样本数与任务记录数",
+          "en": "WebMiner Model training and validation data: business examples and task records"
+        },
+        { "zh": "划分", "en": "Split" },
+        { "zh": "商家样本", "en": "Businesses" },
+        { "zh": "主体", "en": "Identity" },
+        { "zh": "联系", "en": "Contacts" },
+        { "zh": "描述", "en": "Description" },
+        { "zh": "人员", "en": "Staff" },
+        { "zh": "综合", "en": "Combined" },
+        { "zh": "总记录", "en": "Total records" },
+        { "zh": "训练", "en": "Training" },
+        { "zh": "验证", "en": "Validation" },
+        {
+          "zh": "测试集包含 100 条样本。文中的得分、失败数与整组成本均基于该测试集。",
+          "en": "The test set contains 100 examples. All reported scores, failure counts, and total costs refer to this test set."
+        },
+        {
+          "zh": "3.2 模型与优化配置",
+          "en": "3.2 Models and optimization settings"
+        },
+        {
+          "zh": "实验包含 Qwen3.5-0.8B 与 Qwen3.5-2B 两种规模，每种分别进行语言模型全参数微调和 LoRA。全量微调保留视觉模块权重不变；LoRA 保留独立 adapter，并使用合并模型执行本轮评测。",
+          "en": "We evaluate Qwen3.5-0.8B and Qwen3.5-2B, using both full language-model fine-tuning and LoRA at each scale. Full fine-tuning leaves the vision module unchanged. LoRA retains a separate adapter, while the merged model is used for this evaluation."
+        },
+        { "zh": "训练配置", "en": "Training configuration" },
+        {
+          "zh": "四组模型共享配置及方法差异",
+          "en": "Shared settings and differences across the four models"
+        },
+        { "zh": "训练长度与批量", "en": "Epochs and batch size" },
+        {
+          "zh": "1 epoch；microbatch=1，梯度累积=16",
+          "en": "1 epoch; microbatch=1; gradient accumulation=16"
+        },
+        { "zh": "Full 学习率", "en": "Full fine-tuning learning rate" },
+        { "zh": "LoRA 配置", "en": "LoRA settings" },
+        { "zh": "学习率 1 × 10", "en": "Learning rate: 1 × 10" },
+        { "zh": "数值精度", "en": "Numerical precision" },
+        {
+          "zh": "BF16 计算，FP32 可训练参数",
+          "en": "BF16 computation; FP32 trainable parameters"
+        },
+        { "zh": "采样与调度", "en": "Sampling and schedule" },
+        {
+          "zh": "seed=42；全局打乱；cosine；warmup=5%；weight decay=0.01",
+          "en": "seed=42; global shuffle; cosine; warmup=5%; weight decay=0.01"
+        },
+        { "zh": "最大序列长度", "en": "Maximum sequence length" },
+        {
+          "zh": "131,072 tokens，不截断",
+          "en": "131,072 tokens; no truncation"
+        },
+        { "zh": "检查点选择", "en": "Checkpoint selection" },
+        {
+          "zh": "综合任务验证 loss 最低",
+          "en": "Lowest combined-task validation loss"
+        },
+        {
+          "zh": "3.3 评测与成本口径",
+          "en": "3.3 Evaluation and cost accounting"
+        },
+        {
+          "zh": "所有模型使用同一测试集。每次请求只提供网站 URL 和完整 Markdown，由模型一次生成最终的结构化结果，不提供中间任务的答案。 生成结果按照统一规则与预先固定的参考答案进行比较，得到百分制得分。请求失败、未能生成结果或输出未通过格式校验的样本均计为 0 分。",
+          "en": "All models use the same test set. Each request provides only the website URL and complete Markdown, and the model generates the final structured result in one pass without intermediate answers. Results are compared with fixed reference answers using a common scoring procedure, yielding a score out of 100. Failed requests, generation failures, and outputs that fail format validation receive zero points."
+        },
+        {
+          "zh": "评测时尽可能关闭模型的思考功能；无法关闭的模型使用其支持的最低档位，其中 GPT-5 使用 minimal，GPT-OSS-120B 使用 low，GPT-4.1 系列不支持该功能。 各模型的实际设置列在结果表中。",
+          "en": "Reasoning is disabled wherever possible. Models that cannot disable it use their lowest supported setting: minimal for GPT-5 and low for GPT-OSS-120B. The GPT-4.1 family does not support this feature. The actual settings are listed in the results table."
+        },
+        {
+          "zh": "本地运行的 WebMiner Model 和 Qwen 基座模型均以每批 20 条样本进行推理。 API 模型与 Qwen 基座的最大输出长度为 8,192 tokens，WebMiner Model 为 4,096 tokens。",
+          "en": "Locally run WebMiner Model and Qwen base models use batches of 20 examples. API models and Qwen base models have a maximum output length of 8,192 tokens; WebMiner Model uses 4,096 tokens."
+        },
+        {
+          "zh": "成本按完成整个测试集统计。API 模型采用全部请求的记录费用；本地模型则将各批生成结果的实际耗时相加，按配备一张 A100 40GB SXM4 的服务器每小时 $1.99 的价格折算：",
+          "en": "Costs cover the entire test set. API costs are the recorded charges for all requests. For local models, we sum the measured generation time across batches and convert it using a server price of $1.99 per hour for a machine with one A100 40GB SXM4 GPU:"
+        },
+        {
+          "zh": "成本 = 生成秒数 ÷ 3,600 × 1.99",
+          "en": "Cost = generation seconds ÷ 3,600 × 1.99"
+        },
+        {
+          "zh": "。 本地成本仅为生成阶段的估算，不含模型加载、输入准备、结果评分、额外存储和税费，因此与 API 费用的计费范围有所不同。",
+          "en": ". Local costs estimate the generation stage only. They exclude model loading, input preparation, scoring, additional storage, and taxes, so their accounting scope differs from API charges."
+        },
+        {
+          "zh": "表 1 列出本次选定的 13 款模型，按测试集离线得分排序。WebMiner Model 2B full 得分 79.50，在这组模型中排名第 2，比 GPT-4.1 高 1.67 分，比 GPT-5.6 terra 低 3.67 分。",
+          "en": "Table 1 lists the 13 selected models in descending order of test-set score. WebMiner Model 2B full scores 79.50 and ranks second in this group, 1.67 points above GPT-4.1 and 3.67 points below GPT-5.6 terra."
+        },
+        { "zh": "离线得分对比", "en": "Offline score comparison" },
+        {
+          "zh": "模型得分图，可横向滚动",
+          "en": "Model score chart; scroll horizontally to view"
+        },
+        { "zh": "13 款模型的离线得分", "en": "Offline scores for 13 models" },
+        {
+          "zh": "从零起点比较离线得分，按得分降序排列。蓝色为 WebMiner Model，灰色为 API 模型，棕色为 Qwen 基座。完整数值见表 1。",
+          "en": "Offline scores in descending order, with a zero baseline. Blue denotes WebMiner Model, gray denotes API models, and brown denotes Qwen base models. Full values are in Table 1."
+        },
+        {
+          "zh": "图 3. 测试集离线得分。",
+          "en": "Figure 3. Test-set offline scores."
+        },
+        {
+          "zh": "横轴从 0 开始，完整保留 0–100 分尺度。蓝色为 WebMiner Model，灰色为 API 模型，棕色为 Qwen3.5 基座；失败样本按 0 分计入。",
+          "en": "The horizontal axis spans the full 0–100 range. Blue denotes WebMiner Model, gray denotes API models, and brown denotes Qwen3.5 base models. Failed examples receive zero points."
+        },
+        {
+          "zh": "13 款模型评测明细，可横向滚动",
+          "en": "Evaluation details for 13 models; scroll horizontally to view"
+        },
+        {
+          "zh": "表 1. 测试集：得分、失败数与整组成本",
+          "en": "Table 1. Test-set scores, failures, and total costs"
+        },
+        { "zh": "排名", "en": "Rank" },
+        { "zh": "模型", "en": "Model" },
+        { "zh": "思考档位", "en": "Reasoning" },
+        { "zh": "得分 /100", "en": "Score /100" },
+        { "zh": "失败数", "en": "Failures" },
+        { "zh": "成本 USD", "en": "Cost (USD)" },
+        { "zh": "关闭", "en": "Off" },
+        { "zh": "147.5 秒；$1.99/h", "en": "147.5 s; $1.99/h" },
+        { "zh": "不支持", "en": "Not supported" },
+        { "zh": "128.1 秒；$1.99/h", "en": "128.1 s; $1.99/h" },
+        { "zh": "120.5 秒；$1.99/h", "en": "120.5 s; $1.99/h" },
+        { "zh": "122.5 秒；$1.99/h", "en": "122.5 s; $1.99/h" },
+        { "zh": "Qwen3.5-0.8B 基座", "en": "Qwen3.5-0.8B base" },
+        { "zh": "200.0 秒；$1.99/h", "en": "200.0 s; $1.99/h" },
+        { "zh": "Qwen3.5-2B 基座", "en": "Qwen3.5-2B base" },
+        { "zh": "134.9 秒；$1.99/h", "en": "134.9 s; $1.99/h" },
+        { "zh": "平均 $0.001219 / 条", "en": "Average: $0.001219 / example" },
+        {
+          "zh": "≈ 表示本地生成阶段的估算成本。“不支持”指不支持思考；minimal 和 low 是实际使用的思考档位。原始报告还包含其他模型，本页仅展示上述 13 款。",
+          "en": "≈ indicates an estimate for local generation costs. “Not supported” refers to reasoning; minimal and low are the actual reasoning levels used. The source report includes other models; this page presents only the 13 listed above."
+        },
+        { "zh": "得分与生成成本", "en": "Score and generation cost" },
+        {
+          "zh": "得分成本散点图，可横向滚动",
+          "en": "Score–cost scatter plot; scroll horizontally to view"
+        },
+        {
+          "zh": "离线得分与每 100 条测试成本",
+          "en": "Offline score and cost per 100 test examples"
+        },
+        {
+          "zh": "横轴为美元成本，使用对数刻度；纵轴显示 40 至 90 分。每个点标注模型名。API 为记录费用，本地模型为生成阶段成本估算，不代表完整部署成本。",
+          "en": "The horizontal axis shows cost in USD on a logarithmic scale; the vertical axis spans scores from 40 to 90. Each point is labeled with its model name. API costs are recorded charges; local costs are generation-stage estimates, not total deployment costs."
+        },
+        {
+          "zh": "图 4. 测试集得分与成本。",
+          "en": "Figure 4. Test-set scores and costs."
+        },
+        {
+          "zh": "横轴为对数刻度，越靠左成本越低；纵轴显示 40–90 分，越靠上得分越高。标签直接标注模型；API 记录费用与本地估算的计费边界不同。",
+          "en": "The horizontal axis is logarithmic; farther left means lower cost. The vertical axis spans 40–90; higher means a better score. Points are labeled directly. API charges and local estimates cover different cost components."
+        },
+        { "zh": "4.1 本轮观测", "en": "4.1 Observations" },
+        {
+          "zh": "微调模型高于对应基座。",
+          "en": "Fine-tuned models outperform their corresponding base models."
+        },
+        {
+          "zh": "2B full / LoRA 相对 2B 基座分别高 33.52 / 30.67 分；0.8B full / LoRA 相对 0.8B 基座分别高 18.25 / 13.07 分。",
+          "en": "The 2B full and LoRA models exceed the 2B base by 33.52 and 30.67 points, respectively. The 0.8B full and LoRA models exceed the 0.8B base by 18.25 and 13.07 points, respectively."
+        },
+        {
+          "zh": "同规模下 full 得分更高。",
+          "en": "Full fine-tuning scores higher at the same model size."
+        },
+        {
+          "zh": "2B full 比 2B LoRA 高 2.85 分，0.8B full 比 0.8B LoRA 高 5.18 分。两种方法的学习率和更新参数范围不同。",
+          "en": "2B full exceeds 2B LoRA by 2.85 points, and 0.8B full exceeds 0.8B LoRA by 5.18 points. The two methods differ in learning rate and which parameters are updated."
+        },
+        {
+          "zh": "0.8B full 的本轮生成估算成本最低。",
+          "en": "0.8B full has the lowest estimated generation cost in this evaluation."
+        },
+        {
+          "zh": "100 条耗时 120.5 秒，折算约 $0.0666，得分 76.21；2B full 耗时 147.5 秒，折算约 $0.0815，得分 79.50。",
+          "en": "Generating 100 examples takes 120.5 seconds, costing approximately $0.0666 at a score of 76.21. 2B full takes 147.5 seconds, costing approximately $0.0815 at a score of 79.50."
+        },
+        {
+          "zh": "本次评测表明，针对商家网页信息提取任务进行后训练的小规模模型，能够以较低的生成成本，取得接近 GPT-5.6 terra 的提取质量。",
+          "en": "This evaluation shows that small models post-trained specifically for business website extraction can approach GPT-5.6 terra in extraction quality at a lower generation cost."
+        },
+        {
+          "zh": "WebMiner Model · 技术报告 · 2026 年 10 月",
+          "en": "WebMiner Model · Technical report · October 2026"
+        },
+        { "zh": "返回顶部 ↑", "en": "Back to top ↑" },
+        { "zh": "。", "en": "." },
+        { "zh": "。", "en": " of GPT-5.6 terra's API charges." },
+        {
+          "zh": "；rank=16，alpha=32，dropout=0",
+          "en": "; rank=16; alpha=32; dropout=0"
+        },
+        {
+          "zh": "图表可左右滑动",
+          "en": "Scroll horizontally to view the chart"
+        },
+        { "zh": "API 模型", "en": "API models" },
+        { "zh": "Qwen3.5 基座", "en": "Qwen3.5 base" },
+        { "zh": "离线得分 / 100", "en": "Offline score / 100" },
+        {
+          "zh": "100 条样本成本（USD，对数刻度）",
+          "en": "Cost per 100 examples (USD, log scale)"
+        },
+        { "zh": "WebMiner Model · 估算", "en": "WebMiner Model · estimated" },
+        { "zh": "API · 记录费用", "en": "API · recorded" },
+        { "zh": "Qwen3.5 基座 · 估算", "en": "Qwen3.5 base · estimated" }
+      ]
+    </script>
+    <script>
+      (() => {
+        const translations = JSON.parse(
+          document.getElementById("translations").textContent,
+        );
+        // Keep the static English document usable without JavaScript.
+        // Each marker identifies the text node to update without rebuilding markup.
+        const textTargets = [];
+        const walker = document.createTreeWalker(
+          document.documentElement,
+          NodeFilter.SHOW_COMMENT,
+        );
+        while (walker.nextNode()) {
+          const marker = walker.currentNode;
+          const match = /^i18n:(\d+)$/.exec(marker.data);
+          if (match && marker.nextSibling?.nodeType === Node.TEXT_NODE) {
+            textTargets.push({
+              node: marker.nextSibling,
+              id: Number(match[1]),
+            });
+          }
+        }
+        const attributeTargets = [];
+        for (const element of document.querySelectorAll("*")) {
+          for (const attribute of element.attributes) {
+            if (
+              attribute.name.startsWith("data-i18n-") &&
+              attribute.name !== "data-i18n-text"
+            ) {
+              attributeTargets.push({
+                element,
+                attribute: attribute.name.slice(10),
+                id: Number(attribute.value),
+              });
+            }
+          }
+        }
+        const textElements = [...document.querySelectorAll("[data-i18n-text]")];
+        const buttons = [...document.querySelectorAll("[data-language]")];
+        function setLanguage(language) {
+          if (language !== "en" && language !== "zh") return;
+          for (const { node, id } of textTargets) {
+            const value = translations[id][language];
+            node.data =
+              (/^[.,;:!?)]/.test(value) ? "" : " ") +
+              value +
+              (/[($]$/.test(value) ? "" : " ");
+          }
+          for (const { element, attribute, id } of attributeTargets)
+            element.setAttribute(attribute, translations[id][language]);
+          for (const element of textElements)
+            element.textContent =
+              translations[Number(element.dataset.i18nText)][language];
+          document.documentElement.lang = language === "en" ? "en" : "zh-CN";
+          for (const button of buttons)
+            button.setAttribute(
+              "aria-pressed",
+              String(button.dataset.language === language),
+            );
+        }
+        for (const button of buttons)
+          button.addEventListener("click", () =>
+            setLanguage(button.dataset.language),
+          );
+        setLanguage("en");
+      })();
+    </script>
+  </body>
+</html>
